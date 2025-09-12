@@ -160,7 +160,7 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 
 # Link all Object Files into "Final Binary File"
 link_log = @echo "+ Link $@"
-link_cmd = $(CC) $^ -o $@ $(LDFLAGS)
+link_cmd = $(CXX) $^ -o $@ $(LDFLAGS)
 $(BINARY): $(OBJS)
 	$(link_log)
 	$(Q)$(link_cmd)
