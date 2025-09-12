@@ -1,3 +1,8 @@
+**/build/
+**/include/config/
+**/include/generated/
+**/__pycache__/
+
 # Prerequisites
 *.d
 
