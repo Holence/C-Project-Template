@@ -312,12 +312,12 @@ clean:
 	-$(RM) -r $(BUILD_DIR)
 PHONY += clean
 
-clean_config:
+clean-config:
 	-$(RM) -r include/generated include/config .config .config.old
-PHONY += clean_config
+PHONY += clean-config
 
-clean_all: clean clean_config
-PHONY += clean_all
+clean-all: clean clean-config
+PHONY += clean-all
 
 help::
 	@echo 'Main Targets:'
@@ -327,8 +327,8 @@ help::
 	@echo '    memcheck         - compile and memcheck'
 	@echo 'Others:'
 	@echo '    clean            - clean build files'
-	@echo '    clean_config     - clean kconfig files'
-	@echo '    clean_all        - clean all files'
+	@echo '    clean-config     - clean kconfig files'
+	@echo '    clean-all        - clean all files'
 	@echo '    help             - show help text'
 	@echo 'Variables:'
 	@echo '    make V=n           1: verbose build'
