@@ -117,7 +117,8 @@ SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_LEAK),-fsanitize=leak) # don't use this w
 SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_THREAD),-fsanitize=thread) # can't be combined with -fsanitize=address, -fsanitize=leak
 CFLAGS += $(SAN_FLAGS)
 
-# TODO: CXX Compiler Flags
+# CXX Compiler Flags
+CXXFLAGS += $(CFLAGS)
 
 # Linker Flags
 LDFLAGS += $(SAN_FLAGS)
@@ -236,7 +237,7 @@ as_o_S_cmd = $(AS) $(ASFLAGS) -c $< -o $@
 $(BUILD_DIR)/%.s.o: %.s
 	$(Q)mkdir -p $(dir $@)
 	$(as_o_S_log)
-	$(as_o_S_cmd)
+	$(Q)$(as_o_S_cmd)
 
 # Compile Preprocessed Assembly into Object File
 cc_o_s_log = @echo "+ CC $< -> $@"
@@ -264,7 +265,7 @@ $(BUILD_DIR)/%.cpp.o: %.cpp FORCE
 
 # Link all Object Files into "Final Binary File"
 link_log = @echo "+ Link $@"
-link_cmd = $(CC) $^ -o $@ $(LDFLAGS)
+link_cmd = $(CXX) $^ -o $@ $(LDFLAGS)
 $(BINARY): $(OBJS)
 	$(link_log)
 	$(Q)$(link_cmd)

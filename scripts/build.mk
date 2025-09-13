@@ -94,7 +94,8 @@ SAN_FLAGS += -fsanitize=undefined
 # SAN_FLAGS += -fsanitize=thread # can't be combined with -fsanitize=address, -fsanitize=leak
 CFLAGS += $(SAN_FLAGS)
 
-# TODO: CXX Compiler Flags
+# CXX Compiler Flags
+CXXFLAGS += $(CFLAGS)
 
 # Linker Flags
 LDFLAGS += $(SAN_FLAGS)

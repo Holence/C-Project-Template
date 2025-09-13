@@ -19,8 +19,9 @@ int main(void) {
     printf("char*  asm_S_func()     from .S: %s\n", asm_S_func());
     printf("int    asm_s_func()     from .s: %d\n", asm_s_func());
     printf("uint_8 c_func()         from .c: %d\n", c_func());
-    printf("float  cpp_func()       from .cpp: %f\n", cpp_func());
-    printf("double sqrt() from math.h: %f\n", sqrt((double)cpp_func()));
+    float x = cpp_func();
+    printf("float  cpp_func()       from .cpp: %f\n", x);
+    printf("double sqrt(%f) from math.h: %f\n", x, sqrt((double)x));
 
     pthread_t tid[8];
     for (size_t i = 0; i < 8; i++) {

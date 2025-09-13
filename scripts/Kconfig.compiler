@@ -65,6 +65,8 @@ menu "Compiler Options"
 					A fast data race detector
 
 					This option cannot be combined with -fsanitize=address, -fsanitize=leak
+
+					And don't use this with valgrind!
 		endmenu
 
 		config CC_DEBUG

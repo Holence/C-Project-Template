@@ -1,5 +1,5 @@
 #define BUILD_INFO __DATE__ " " __TIME__
-#define STARTUP_MSG "Startup complete! Built on " BUILD_INFO
+#define STARTUP_MSG "Greetings sire! Built on " BUILD_INFO
 
     .data
     .globl startup_message
