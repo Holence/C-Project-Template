@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Holence <Holence08@gmail.com>
+
 # Find all the C/C++ files recursively  (also follow symlinks)
 find_srcs = $(shell find $1 -name '*.cpp' -or -name '*.c' -or -name '*.s' -or -name '*.S' -follow)
 

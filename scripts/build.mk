@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Holence <Holence08@gmail.com>
+
 # TODO "Final Binary File" could be .so or .a
 
 # project struture:

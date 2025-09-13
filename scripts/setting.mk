@@ -1,5 +1,6 @@
-# Your Makefiles are wrong: https://tech.davis-hansson.com/p/make/
+# Copyright (C) 2025 Holence <Holence08@gmail.com>
 
+# Reference: Your Makefiles are wrong: https://tech.davis-hansson.com/p/make/
 SHELL := bash
 
 # MAKEFLAGS += --warn-undefined-variables 
