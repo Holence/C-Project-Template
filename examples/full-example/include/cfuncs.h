@@ -1,6 +1,8 @@
 #ifndef C_FUNCS_H
 #define C_FUNCS_H
 
-void c_function(void);
+#include <stdint.h>
+
+uint8_t c_func();
 
 #endif

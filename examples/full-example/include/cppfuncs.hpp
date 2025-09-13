@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void cpp_function();
+float cpp_func();
 
 #ifdef __cplusplus
 }

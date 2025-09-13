@@ -117,7 +117,7 @@ as_o_S_cmd = $(AS) $(ASFLAGS) -c $< -o $@
 $(BUILD_DIR)/%.s.o: %.s
 	$(Q)mkdir -p $(dir $@)
 	$(as_o_S_log)
-	$(as_o_S_cmd)
+	$(Q)$(as_o_S_cmd)
 
 # Compile Preprocessed Assembly into Object File
 cc_o_s_log = @echo "+ CC $< -> $@"

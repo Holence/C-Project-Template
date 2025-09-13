@@ -2,6 +2,7 @@
 #define ASM_FUNCS_H
 
 extern const char startup_message[];
-int call_me_from_c(void);
+char *asm_S_func();
+int asm_s_func();
 
 #endif
