@@ -18,4 +18,4 @@ config THREAD_NUM
 	int "Thread Worker Number"
 	default 8
 
-source "../../scripts/Kconfig.compiler"
+source "scripts/Kconfig.compiler"

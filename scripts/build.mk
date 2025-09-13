@@ -186,6 +186,9 @@ clean:
 	-$(RM) -r $(BUILD_DIR)
 PHONY += clean
 
+clean-all: clean
+PHONY += clean-all
+
 help::
 	@echo 'Main Targets:'
 	@echo '    app              - compile (default target)'
@@ -193,6 +196,7 @@ help::
 	@echo '    memcheck         - compile and memcheck'
 	@echo 'Others:'
 	@echo '    clean            - clean build files'
+	@echo '    clean-all        - run all clean targets'
 	@echo '    help             - show help text'
 	@echo 'Variables:'
 	@echo '    make V=1         - verbose'

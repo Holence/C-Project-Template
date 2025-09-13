@@ -1,5 +1,5 @@
 # include useful settings
-include ../../scripts/setting.mk
+include scripts/setting.mk
 
 # include naive building rules
-include ../../scripts/build.mk
+include scripts/build.mk

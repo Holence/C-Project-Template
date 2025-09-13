@@ -329,7 +329,7 @@ help::
 	@echo 'Others:'
 	@echo '    clean            - clean build files'
 	@echo '    clean-config     - clean kconfig files'
-	@echo '    clean-all        - clean all files'
+	@echo '    clean-all        - run all clean targets'
 	@echo '    help             - show help text'
 	@echo 'Variables:'
 	@echo '    make V=n           1: verbose build'
