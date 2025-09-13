@@ -2,6 +2,8 @@
 **/include/config/
 **/include/generated/
 **/__pycache__/
+.config
+.config.old
 
 # Prerequisites
 *.d

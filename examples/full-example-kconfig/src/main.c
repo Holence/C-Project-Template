@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include "asmfuncs.h"
+#include "cfuncs.h"
+#include "cppfuncs.hpp"
+#include "generated/autoconf.h"
+
+#include <math.h>
+#include <pthread.h>
+#include <unistd.h>
+
+static void *worker_thread(void *arg) {
+    size_t i = (size_t)arg;
+    usleep(100000 * i);
+    printf("pthread worker [%zu] done\n", i);
+    return NULL;
+}
+
+int main(void) {
+    printf("char*  startup_message  from .S: %s\n", startup_message);
+    printf("char*  asm_S_func()     from .S: %s\n", asm_S_func());
+    printf("int    asm_s_func()     from .s: %d\n", asm_s_func());
+    printf("uint_8 c_func()         from .c: %d\n", c_func());
+    float x = cpp_func();
+    printf("float  cpp_func()       from .cpp: %f\n", x);
+    printf("double sqrt(%f) from math.h: %f\n", x, sqrt((double)x));
+
+#if CONFIG_THREAD_NUM
+    pthread_t tid[CONFIG_THREAD_NUM];
+    for (size_t i = 0; i < CONFIG_THREAD_NUM; i++) {
+        pthread_create(tid + i, NULL, worker_thread, (void *)i);
+    }
+    for (size_t i = 0; i < CONFIG_THREAD_NUM; i++) {
+        pthread_join(tid[i], NULL);
+    }
+#endif
+
+    return 0;
+}

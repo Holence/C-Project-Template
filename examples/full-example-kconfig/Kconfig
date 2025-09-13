@@ -1,0 +1,21 @@
+config ASM_STRING
+	string "greeting string used in asmfuncs.S"
+	default "Greetings sire!"
+
+config C_HEX
+	hex "hex used in cfuncs.c"
+	default 0xC
+
+config CPP_FLOAT
+	int "float used in cppfuncs.cpp"
+	default 114514
+	help
+		Kconfig don't have float type
+		Enter your floating-point number multiplied by 1000
+		For example, 114.514 -> 114514
+
+config THREAD_NUM
+	int "Thread Worker Number"
+	default 8
+
+source "../../scripts/Kconfig.compiler"
