@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "asm.h"
+#include "asmfuncs.h"
 #include "cfuncs.h"
 #include "cppfuncs.hpp"
 
