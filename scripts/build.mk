@@ -58,7 +58,7 @@ SHARED ?=
 # - BINARY_EXEC -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/bin/
 # - BINARY_LIB_STATIC -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/lib/
 # - BINARY_LIB_SHARED -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/lib/
-# - BINARY_LIB_HEADERS -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/include/
+# - ./include/* -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/include/*
 # 
 # $(INSTALL_DESTDIR)$(INSTALL_PREFIX) default to /usr/local
 #   you can change INSTALL_DESTDIR, such as /tmp
@@ -66,11 +66,6 @@ SHARED ?=
 INSTALL_DESTDIR ?=
 INSTALL_PREFIX  ?= /usr/local
 INSTALL_DIR     = $(INSTALL_DESTDIR)$(INSTALL_PREFIX)
-
-# if you also want to install header files, then
-# you should define them manulayy
-# (using `find -type f -name "*.h"` is too rude)
-BINARY_LIB_HEADERS ?=
 
 ################################
 #        Generated Vars        #
@@ -247,16 +242,20 @@ PHONY += clean
 clean-all: clean
 PHONY += clean-all
 
-# Install to system
-# - /usr/local/bin/$(BINARY_EXEC)
-# - /usr/local/lib/$(BINARY_LIB_STATIC)
-# - /usr/local/lib/$(BINARY_LIB_SHARED)
-# - each of $(BINARY_LIB_HEADERS) to /usr/local/include/
-define __install # __install(file_path,dst_dir,permission_mode)
+# __install(file_path,dst_dir,permission_mode)
+# 1. create dst_dir if not exist
+# 2. copy file from file_path to dst_dir and chmod permission_mode
+define __install
 	$(Q)install -d $2
 	$(Q)install -m$3 $1 $2
 	@printf "$(ANSI_FG_GREEN)+ Install $$(ls $2$(notdir $1))$(ANSI_NONE)\n"
 endef
+
+# Install to system
+# - /usr/local/bin/$(BINARY_EXEC)
+# - /usr/local/lib/$(BINARY_LIB_STATIC)
+# - /usr/local/lib/$(BINARY_LIB_SHARED)
+# - ./include/* to /usr/local/include/*
 install: all
 ifneq ($(BINARY_EXEC),)
 	$(call __install,$(BINARY_EXEC),$(INSTALL_DIR)/bin/,755)
@@ -267,9 +266,9 @@ endif
 ifneq ($(BINARY_LIB_SHARED),)
 	$(call __install,$(BINARY_LIB_SHARED),$(INSTALL_DIR)/lib/,644)
 endif
-ifneq ($(BINARY_LIB_HEADERS),)
-	$(foreach header,$(BINARY_LIB_HEADERS),\
-		$(call __install,$(header),$(INSTALL_DIR)/include/,644)$(newline)\
+ifneq ($(BINARY_LIB_STATIC)$(BINARY_LIB_SHARED),)
+	$(foreach __file,$(shell find include -type f),\
+		$(call __install,$(__file),$(dir $(INSTALL_DIR)/$(__file)),644)$(newline)\
 	)
 endif
 PHONY += install
@@ -278,23 +277,20 @@ PHONY += install
 # - /usr/local/bin/$(BINARY_EXEC)
 # - /usr/local/lib/$(BINARY_LIB_STATIC)
 # - /usr/local/lib/$(BINARY_LIB_SHARED)
-# - each of $(BINARY_LIB_HEADERS) in /usr/local/include/
-define __uninstall # __uninstall(dir,file_path) # note: notdir is used for extracting filename from file_path
-	-$(RM) $1$(notdir $2)
-endef
+# - ./include/* in /usr/local/include/*
 uninstall:
 ifneq ($(BINARY_EXEC),)
-	$(call __uninstall,$(INSTALL_DIR)/bin/,$(BINARY_EXEC))
+	-$(RM) -r $(INSTALL_DIR)/bin/$(notdir $(BINARY_EXEC))
 endif
 ifneq ($(BINARY_LIB_STATIC),)
-	$(call __uninstall,$(INSTALL_DIR)/lib/,$(BINARY_LIB_STATIC))
+	-$(RM) -r $(INSTALL_DIR)/lib/$(notdir $(BINARY_LIB_STATIC))
 endif
 ifneq ($(BINARY_LIB_SHARED),)
-	$(call __uninstall,$(INSTALL_DIR)/lib/,$(BINARY_LIB_SHARED))
+	-$(RM) -r $(INSTALL_DIR)/lib/$(notdir $(BINARY_LIB_SHARED))
 endif
-ifneq ($(BINARY_LIB_HEADERS),)
-	$(foreach header,$(BINARY_LIB_HEADERS),\
-		$(call __uninstall,$(INSTALL_DIR)/include/,$(header))$(newline)\
+ifneq ($(BINARY_LIB_STATIC)$(BINARY_LIB_SHARED),)
+	$(foreach __file,$(shell find include -mindepth 1),\
+		-$(RM) -r $(INSTALL_DIR)/$(__file)$(newline)\
 	)
 endif
 PHONY += uninstall
@@ -315,8 +311,8 @@ help::
 	@echo '                       default location: /usr/local/lib/'
 	@echo '                   install BINARY_LIB_SHARED if SHARED=1'
 	@echo '                       default location: /usr/local/lib/'
-	@echo '                   install BINARY_LIB_HEADERS if STATIC || SHARED is set'
-	@echo '                       default location: /usr/local/include/'
+	@echo '                   install ./include/* if STATIC || SHARED is set'
+	@echo '                       default location: /usr/local/include/*'
 	@echo '    uninstall    - remove installed files'
 	@echo 'Others:'
 	@echo '    clean        - clean build dir'
@@ -342,7 +338,6 @@ $(call colored_print,$(ANSI_FG_BLACK),--------------- Config for Install -------
 $(call colored_print,$(ANSI_FG_BLACK),INSTALL_DESTDIR    : $(INSTALL_DESTDIR))
 $(call colored_print,$(ANSI_FG_BLACK),INSTALL_PREFIX     : $(INSTALL_PREFIX))
 $(call colored_print,$(ANSI_FG_BLACK),INSTALL_DIR        : $(INSTALL_DIR))
-$(call colored_print,$(ANSI_FG_BLACK),BINARY_LIB_HEADERS : $(BINARY_LIB_HEADERS))
 $(call colored_print,$(ANSI_FG_BLACK),================= Generated Vars =================)
 $(call colored_print,$(ANSI_FG_BLACK),BINARY_EXEC       : $(BINARY_EXEC))
 $(call colored_print,$(ANSI_FG_BLACK),BINARY_LIB_STATIC : $(BINARY_LIB_STATIC))
