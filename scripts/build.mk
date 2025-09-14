@@ -51,6 +51,27 @@ INC_DIRS ?= $(call find_dirs, .)
 STATIC ?=
 SHARED ?=
 
+##### Config for Install #####
+# To install to your system  
+
+# default install location:
+# - BINARY_EXEC -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/bin/
+# - BINARY_LIB_STATIC -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/lib/
+# - BINARY_LIB_SHARED -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/lib/
+# - BINARY_LIB_HEADERS -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/include/
+# 
+# $(INSTALL_DESTDIR)$(INSTALL_PREFIX) default to /usr/local
+#   you can change INSTALL_DESTDIR, such as /tmp
+#   thus $(INSTALL_DESTDIR)$(INSTALL_PREFIX) will be /tmp/usr/local
+INSTALL_DESTDIR ?=
+INSTALL_PREFIX  ?= /usr/local
+INSTALL_DIR     = $(INSTALL_DESTDIR)$(INSTALL_PREFIX)
+
+# if you also want to install header files, then
+# you should define them manulayy
+# (using `find -type f -name "*.h"` is too rude)
+BINARY_LIB_HEADERS ?=
+
 ################################
 #        Generated Vars        #
 ################################
@@ -226,6 +247,58 @@ PHONY += clean
 clean-all: clean
 PHONY += clean-all
 
+# Install to system
+# - /usr/local/bin/$(BINARY_EXEC)
+# - /usr/local/lib/$(BINARY_LIB_STATIC)
+# - /usr/local/lib/$(BINARY_LIB_SHARED)
+# - each of $(BINARY_LIB_HEADERS) to /usr/local/include/
+define __install # __install(file_path,dst_dir,permission_mode)
+	$(Q)install -d $2
+	$(Q)install -m$3 $1 $2
+	@printf "$(ANSI_FG_GREEN)+ Install $$(ls $2$(notdir $1))$(ANSI_NONE)\n"
+endef
+install: all
+ifneq ($(BINARY_EXEC),)
+	$(call __install,$(BINARY_EXEC),$(INSTALL_DIR)/bin/,755)
+endif
+ifneq ($(BINARY_LIB_STATIC),)
+	$(call __install,$(BINARY_LIB_STATIC),$(INSTALL_DIR)/lib/,644)
+endif
+ifneq ($(BINARY_LIB_SHARED),)
+	$(call __install,$(BINARY_LIB_SHARED),$(INSTALL_DIR)/lib/,644)
+endif
+ifneq ($(BINARY_LIB_HEADERS),)
+	$(foreach header,$(BINARY_LIB_HEADERS),\
+		$(call __install,$(header),$(INSTALL_DIR)/include/,644)$(newline)\
+	)
+endif
+PHONY += install
+
+# Remove installed files
+# - /usr/local/bin/$(BINARY_EXEC)
+# - /usr/local/lib/$(BINARY_LIB_STATIC)
+# - /usr/local/lib/$(BINARY_LIB_SHARED)
+# - each of $(BINARY_LIB_HEADERS) in /usr/local/include/
+define __uninstall # __uninstall(dir,file_path) # note: notdir is used for extracting filename from file_path
+	-$(RM) $1$(notdir $2)
+endef
+uninstall:
+ifneq ($(BINARY_EXEC),)
+	$(call __uninstall,$(INSTALL_DIR)/bin/,$(BINARY_EXEC))
+endif
+ifneq ($(BINARY_LIB_STATIC),)
+	$(call __uninstall,$(INSTALL_DIR)/lib/,$(BINARY_LIB_STATIC))
+endif
+ifneq ($(BINARY_LIB_SHARED),)
+	$(call __uninstall,$(INSTALL_DIR)/lib/,$(BINARY_LIB_SHARED))
+endif
+ifneq ($(BINARY_LIB_HEADERS),)
+	$(foreach header,$(BINARY_LIB_HEADERS),\
+		$(call __uninstall,$(INSTALL_DIR)/include/,$(header))$(newline)\
+	)
+endif
+PHONY += uninstall
+
 help::
 	@echo 'Main Targets:'
 	@echo '    all          - compile (default target)'
@@ -234,6 +307,17 @@ help::
 	@echo '                   build BINARY_LIB_SHARED if SHARED=1'
 	@echo '    run          - compile BINARY_EXEC and run'
 	@echo '    memcheck     - compile BINARY_EXEC and memcheck'
+	@echo 'Install Targets:'
+	@echo '    install      - install to system'
+	@echo '                   install BINARY_EXEC if STATIC && SHARED not set (default)'
+	@echo '                       default location: /usr/local/bin/'
+	@echo '                   install BINARY_LIB_STATIC if STATIC=1'
+	@echo '                       default location: /usr/local/lib/'
+	@echo '                   install BINARY_LIB_SHARED if SHARED=1'
+	@echo '                       default location: /usr/local/lib/'
+	@echo '                   install BINARY_LIB_HEADERS if STATIC || SHARED is set'
+	@echo '                       default location: /usr/local/include/'
+	@echo '    uninstall    - remove installed files'
 	@echo 'Others:'
 	@echo '    clean        - clean build dir'
 	@echo '    clean-all    - run all clean targets'
@@ -245,30 +329,37 @@ PHONY += help
 .PHONY: $(PHONY)
 
 ifneq ($(findstring 1, $V),)
-$(call colored_print,$(ANSI_FG_BLACK),---------- Custom Config -----------)
+$(call colored_print,$(ANSI_FG_BLACK),================= Custom Config ==================)
+$(call colored_print,$(ANSI_FG_BLACK),--------------- Config for Build -----------------)
 $(call colored_print,$(ANSI_FG_BLACK),NAME      : $(NAME))
 $(call colored_print,$(ANSI_FG_BLACK),SRCS      : $(SRCS))
 $(call colored_print,$(ANSI_FG_BLACK),BUILD_DIR : $(BUILD_DIR))
 $(call colored_print,$(ANSI_FG_BLACK),INC_DIRS  : $(INC_DIRS))
-$(call colored_print,$(ANSI_FG_BLACK),STATIC    : $(STATIC))
-$(call colored_print,$(ANSI_FG_BLACK),SHARED    : $(SHARED))
-$(call colored_print,$(ANSI_FG_BLACK),---------- Generated Vars ----------)
+$(call colored_print,$(ANSI_FG_BLACK),--------------- Config for Build LIB -------------)
+$(call colored_print,$(ANSI_FG_BLACK),STATIC : $(STATIC))
+$(call colored_print,$(ANSI_FG_BLACK),SHARED : $(SHARED))
+$(call colored_print,$(ANSI_FG_BLACK),--------------- Config for Install ---------------)
+$(call colored_print,$(ANSI_FG_BLACK),INSTALL_DESTDIR    : $(INSTALL_DESTDIR))
+$(call colored_print,$(ANSI_FG_BLACK),INSTALL_PREFIX     : $(INSTALL_PREFIX))
+$(call colored_print,$(ANSI_FG_BLACK),INSTALL_DIR        : $(INSTALL_DIR))
+$(call colored_print,$(ANSI_FG_BLACK),BINARY_LIB_HEADERS : $(BINARY_LIB_HEADERS))
+$(call colored_print,$(ANSI_FG_BLACK),================= Generated Vars =================)
 $(call colored_print,$(ANSI_FG_BLACK),BINARY_EXEC       : $(BINARY_EXEC))
 $(call colored_print,$(ANSI_FG_BLACK),BINARY_LIB_STATIC : $(BINARY_LIB_STATIC))
 $(call colored_print,$(ANSI_FG_BLACK),BINARY_LIB_SHARED : $(BINARY_LIB_SHARED))
 $(call colored_print,$(ANSI_FG_BLACK),OBJS              : $(OBJS))
 $(call colored_print,$(ANSI_FG_BLACK),INC_FLAGS         : $(INC_FLAGS))
-$(call colored_print,$(ANSI_FG_BLACK),--------- Common variables ---------)
-$(call colored_print,$(ANSI_FG_BLACK),AS        : $(AS))
-$(call colored_print,$(ANSI_FG_BLACK),CC        : $(CC))
-$(call colored_print,$(ANSI_FG_BLACK),CXX       : $(CXX))
-$(call colored_print,$(ANSI_FG_BLACK),AR        : $(AR))
-$(call colored_print,$(ANSI_FG_BLACK),RM        : $(RM))
-$(call colored_print,$(ANSI_FG_BLACK),-------------- Flags ---------------)
-$(call colored_print,$(ANSI_FG_BLACK),CPPFLAGS  : $(CPPFLAGS))
-$(call colored_print,$(ANSI_FG_BLACK),CFLAGS    : $(CFLAGS))
-$(call colored_print,$(ANSI_FG_BLACK),CXXFLAGS  : $(CXXFLAGS))
-$(call colored_print,$(ANSI_FG_BLACK),LDFLAGS   : $(LDFLAGS))
-$(call colored_print,$(ANSI_FG_BLACK),-------------- DEPS ----------------)
-$(call colored_print,$(ANSI_FG_BLACK),DEPS      : $(DEPS))
+$(call colored_print,$(ANSI_FG_BLACK),================ Common variables ================)
+$(call colored_print,$(ANSI_FG_BLACK),AS  : $(AS))
+$(call colored_print,$(ANSI_FG_BLACK),CC  : $(CC))
+$(call colored_print,$(ANSI_FG_BLACK),CXX : $(CXX))
+$(call colored_print,$(ANSI_FG_BLACK),AR  : $(AR))
+$(call colored_print,$(ANSI_FG_BLACK),RM  : $(RM))
+$(call colored_print,$(ANSI_FG_BLACK),====================== Flags =====================)
+$(call colored_print,$(ANSI_FG_BLACK),CPPFLAGS : $(CPPFLAGS))
+$(call colored_print,$(ANSI_FG_BLACK),CFLAGS   : $(CFLAGS))
+$(call colored_print,$(ANSI_FG_BLACK),CXXFLAGS : $(CXXFLAGS))
+$(call colored_print,$(ANSI_FG_BLACK),LDFLAGS  : $(LDFLAGS))
+$(call colored_print,$(ANSI_FG_BLACK),====================== DEPS ======================)
+$(call colored_print,$(ANSI_FG_BLACK),DEPS : $(DEPS))
 endif
