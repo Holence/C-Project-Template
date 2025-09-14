@@ -1,0 +1,5 @@
+config VERSION
+    string "version"
+    default "V114.514"
+
+source "scripts/Kconfig.compiler"
