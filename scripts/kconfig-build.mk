@@ -400,7 +400,7 @@ ifneq ($(BINARY_LIB_SHARED),)
 	$(call __install,$(BINARY_LIB_SHARED),$(INSTALL_DIR)/lib/,644)
 endif
 ifneq ($(BINARY_LIB_STATIC)$(BINARY_LIB_SHARED),)
-	$(foreach __file,$(shell find include -type f),\
+	$(foreach __file,$(shell find include -not \( -path 'include/config/*' -o -path 'include/generated/*' \) -type f),\
 		$(call __install,$(__file),$(dir $(INSTALL_DIR)/$(__file)),644)$(newline)\
 	)
 endif
@@ -422,7 +422,7 @@ ifneq ($(BINARY_LIB_SHARED),)
 	-$(RM) -r $(INSTALL_DIR)/lib/$(notdir $(BINARY_LIB_SHARED))
 endif
 ifneq ($(BINARY_LIB_STATIC)$(BINARY_LIB_SHARED),)
-	$(foreach __file,$(shell find include -mindepth 1),\
+	$(foreach __file,$(shell find include -mindepth 1 -maxdepth 1 -not \( -path 'include/config' -o -path 'include/generated' \)),\
 		-$(RM) -r $(INSTALL_DIR)/$(__file)$(newline)\
 	)
 endif
