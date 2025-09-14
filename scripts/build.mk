@@ -1,7 +1,5 @@
 # Copyright (C) 2025 Holence <Holence08@gmail.com>
 
-# TODO "Final Binary File" could be .so or .a
-
 # project struture:
 # .
 # ├── Makefile
@@ -22,29 +20,36 @@ include $(__mkfile_dir)/color.mk
 #        Custom Config         #
 ################################
 
+##### Config for Verbose #####
+V ?=
 ifneq ($(findstring 1, $V),)
   Q =
 else
   Q = @
 endif
 
-# the name of "Final Binary File"
-# default value: main.out
-NAME ?= main.out
+##### Config for Build #####
+# the name of "Binary File"
+# default value: main
+NAME ?= main
 
 # all the source files (.s, .S, .c, .cpp)
 # will be compiled into object files using compiler, see "Recipes"
 # default value: all srcs under current working directory
 SRCS ?= $(call find_srcs, .)
 
-# the build dir
+# the building dir
 # default value: ./build
 BUILD_DIR ?= ./build
 
-# all dirs for searching header files
+# all the dirs for searching header files
 # will be used as -I flags for compiling
 # default value: all dirs under current working directory
 INC_DIRS ?= $(call find_dirs, .)
+
+##### Config for Build LIB #####
+STATIC ?=
+SHARED ?=
 
 ################################
 #        Generated Vars        #
@@ -54,8 +59,19 @@ INC_DIRS ?= $(call find_dirs, .)
 # SRCS -> OBJS
 # INC_DIRS -> INC_FLAGS
 
-# the "Final Binary File"
-BINARY = $(BUILD_DIR)/$(NAME)
+# the "Binary File"
+## build executable file only if STATIC && SHARED not set
+ifeq ($(STATIC)$(SHARED),)
+BINARY_EXEC = $(BUILD_DIR)/$(NAME)
+endif
+## build static library (archive file) if STATIC=1
+ifeq ($(STATIC),1)
+BINARY_LIB_STATIC = $(BUILD_DIR)/lib$(NAME).a
+endif
+## build dynamic library (shared object file) if SHARED=1
+ifeq ($(SHARED),1)
+BINARY_LIB_SHARED = $(BUILD_DIR)/lib$(NAME).so
+endif
 
 # Prepends BUILD_DIR and appends .o to every src file
 # As an example, ./your_dir/hello.cpp turns into BUILD_DIR/./your_dir/hello.cpp.o
@@ -96,6 +112,11 @@ SAN_FLAGS += -fsanitize=undefined
 # SAN_FLAGS += -fsanitize=thread # can't be combined with -fsanitize=address, -fsanitize=leak
 CFLAGS += $(SAN_FLAGS)
 
+# add compiler flag -fPIC if building .so
+ifeq ($(SHARED),1)
+CFLAGS += -fPIC
+endif
+
 # CXX Compiler Flags
 CXXFLAGS += $(CFLAGS)
 
@@ -105,12 +126,17 @@ LDFLAGS += $(SAN_FLAGS)
 LDFLAGS += -Wl,--gc-sections
 # LDFLAGS += -Wl,-Map=output.map
 
+# add linker flag -shared if building .so
+ifeq ($(SHARED),1)
+LDFLAGS += -shared
+endif
+
 ################################
 #           Recipes            #
 ################################
 
 # As an example, BUILD_DIR/hello.cpp.o turns into BUILD_DIR/hello.cpp.d
-DEPS     := $(OBJS:.o=.d)
+DEPS = $(OBJS:.o=.d)
 # Let make knows which .o depend on which .o / .h
 -include $(DEPS)
 
@@ -161,47 +187,59 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 # 	$(cxx_o_cpp_preprocessor_log)
 # 	$(cxx_o_cpp_preprocessor_cmd)
 
-# Link all Object Files into "Final Binary File"
+# Link all Object Files into BINARY_EXEC or BINARY_LIB_SHARED
 link_log = @echo "+ Link $@"
 link_cmd = $(CXX) $^ -o $@ $(LDFLAGS)
-$(BINARY): $(OBJS)
+$(BINARY_EXEC) $(BINARY_LIB_SHARED): $(OBJS)
 	$(link_log)
 	$(Q)$(link_cmd)
+
+# Archive all Object Files into BINARY_LIB_STATIC
+archive_log = @echo "+ AR $@"
+archive_cmd = $(AR) rcs $@ $^
+$(BINARY_LIB_STATIC): $(OBJS)
+	$(archive_log)
+	$(Q)$(archive_cmd)
 
 ################################
 #            Rules             #
 ################################
 
-.DEFAULT_GOAL = app
-app: $(BINARY)
-PHONY += app
+.DEFAULT_GOAL = all
+all: $(BINARY_EXEC) $(BINARY_LIB_STATIC) $(BINARY_LIB_SHARED)
+PHONY += all
 
-run: app
-	@$(BINARY)
+run: $(BINARY_EXEC)
+	@$(BINARY_EXEC)
 PHONY += run
 
-memcheck: app
-	$(call run_memcheck, $(BINARY))
+memcheck: $(BINARY_EXEC)
+	$(call run_memcheck, $(BINARY_EXEC))
 PHONY += memcheck
 
+# clean build dir
 clean:
 	-$(RM) -r $(BUILD_DIR)
 PHONY += clean
 
+# all clean targets
 clean-all: clean
 PHONY += clean-all
 
 help::
 	@echo 'Main Targets:'
-	@echo '    app              - compile (default target)'
-	@echo '    run              - compile and run'
-	@echo '    memcheck         - compile and memcheck'
+	@echo '    all          - compile (default target)'
+	@echo '                   build BINARY_EXEC if STATIC && SHARED not set (default)'
+	@echo '                   build BINARY_LIB_STATIC if STATIC=1'
+	@echo '                   build BINARY_LIB_SHARED if SHARED=1'
+	@echo '    run          - compile BINARY_EXEC and run'
+	@echo '    memcheck     - compile BINARY_EXEC and memcheck'
 	@echo 'Others:'
-	@echo '    clean            - clean build files'
-	@echo '    clean-all        - run all clean targets'
-	@echo '    help             - show help text'
+	@echo '    clean        - clean build dir'
+	@echo '    clean-all    - run all clean targets'
+	@echo '    help         - show help text'
 	@echo 'Variables:'
-	@echo '    make V=1         - verbose'
+	@echo '    make V=1     - verbose'
 PHONY += help
 
 .PHONY: $(PHONY)
@@ -212,14 +250,19 @@ $(call colored_print,$(ANSI_FG_BLACK),NAME      : $(NAME))
 $(call colored_print,$(ANSI_FG_BLACK),SRCS      : $(SRCS))
 $(call colored_print,$(ANSI_FG_BLACK),BUILD_DIR : $(BUILD_DIR))
 $(call colored_print,$(ANSI_FG_BLACK),INC_DIRS  : $(INC_DIRS))
+$(call colored_print,$(ANSI_FG_BLACK),STATIC    : $(STATIC))
+$(call colored_print,$(ANSI_FG_BLACK),SHARED    : $(SHARED))
 $(call colored_print,$(ANSI_FG_BLACK),---------- Generated Vars ----------)
-$(call colored_print,$(ANSI_FG_BLACK),BINARY    : $(BINARY))
-$(call colored_print,$(ANSI_FG_BLACK),OBJS      : $(OBJS))
-$(call colored_print,$(ANSI_FG_BLACK),INC_FLAGS : $(INC_FLAGS))
+$(call colored_print,$(ANSI_FG_BLACK),BINARY_EXEC       : $(BINARY_EXEC))
+$(call colored_print,$(ANSI_FG_BLACK),BINARY_LIB_STATIC : $(BINARY_LIB_STATIC))
+$(call colored_print,$(ANSI_FG_BLACK),BINARY_LIB_SHARED : $(BINARY_LIB_SHARED))
+$(call colored_print,$(ANSI_FG_BLACK),OBJS              : $(OBJS))
+$(call colored_print,$(ANSI_FG_BLACK),INC_FLAGS         : $(INC_FLAGS))
 $(call colored_print,$(ANSI_FG_BLACK),--------- Common variables ---------)
 $(call colored_print,$(ANSI_FG_BLACK),AS        : $(AS))
 $(call colored_print,$(ANSI_FG_BLACK),CC        : $(CC))
 $(call colored_print,$(ANSI_FG_BLACK),CXX       : $(CXX))
+$(call colored_print,$(ANSI_FG_BLACK),AR        : $(AR))
 $(call colored_print,$(ANSI_FG_BLACK),RM        : $(RM))
 $(call colored_print,$(ANSI_FG_BLACK),-------------- Flags ---------------)
 $(call colored_print,$(ANSI_FG_BLACK),CPPFLAGS  : $(CPPFLAGS))
