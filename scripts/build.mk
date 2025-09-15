@@ -265,6 +265,7 @@ ifneq ($(BINARY_LIB_STATIC),)
 endif
 ifneq ($(BINARY_LIB_SHARED),)
 	$(call __install,$(BINARY_LIB_SHARED),$(INSTALL_DIR)/lib/,644)
+	ldconfig
 endif
 ifneq ($(BINARY_LIB_STATIC)$(BINARY_LIB_SHARED),)
 	$(foreach __file,$(shell find include -not \( -path 'include/config/*' -o -path 'include/generated/*' \) -type f),\
@@ -287,6 +288,7 @@ ifneq ($(BINARY_LIB_STATIC),)
 endif
 ifneq ($(BINARY_LIB_SHARED),)
 	-$(RM) -r $(INSTALL_DIR)/lib/$(notdir $(BINARY_LIB_SHARED))
+	ldconfig
 endif
 ifneq ($(BINARY_LIB_STATIC)$(BINARY_LIB_SHARED),)
 	$(foreach __file,$(shell find include -mindepth 1 -maxdepth 1 -not \( -path 'include/config' -o -path 'include/generated' \)),\
@@ -316,7 +318,7 @@ help::
 	@echo '    uninstall    - remove installed files'
 	@echo ''
 	@echo '    Note: These targets require root permissions!'
-	@echo '          And you should run `sudo ldconfig` after install/uninstall SHARED lib'
+	@echo '          And `ldconfig` is automatically called after install/uninstall SHARED lib'
 	@echo 'Others:'
 	@echo '    clean        - clean build dir'
 	@echo '    clean-all    - run all clean targets'
