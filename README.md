@@ -8,6 +8,9 @@ wget -O fetch-scripts.sh https://raw.githubusercontent.com/Holence/C-Project-Tem
 
 ## Feature
 
-- makefile + kconfig
-- `make STATIC=1 SHARE=1` to build static/shared library
-- `make install`/`make uninstall` to install/uninstall "executable" / "static/shared library" / "library headers" into `/usr/local`
+- Makefile with rules for compiling and linking .s, .S, .c, .cpp, and static/dynamic library
+- support kconfig + fixdep
+- install/uninstall
+  - executable to `/usr/local/bin`
+  - static/shared library to `/usr/local/lib`
+  - library headers to `/usr/local/include`
