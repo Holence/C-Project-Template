@@ -151,10 +151,17 @@ endif
 #           Recipes            #
 ################################
 
+FORCE:
+PHONY += FORCE
+
+##### DEPS #####
+
 # As an example, BUILD_DIR/hello.cpp.o turns into BUILD_DIR/hello.cpp.d
 DEPS = $(OBJS:.o=.d)
 # Let make knows which .o depend on which .o / .h
 -include $(DEPS)
+
+##### Compile #####
 
 # Compile Pure Assembly into Object File
 as_o_S_log = @echo "+ AS $< -> $@"
@@ -203,12 +210,25 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 # 	$(cxx_o_cpp_preprocessor_log)
 # 	$(cxx_o_cpp_preprocessor_cmd)
 
+##### Link #####
+
+# If LDFLAGS changed, by default make won't auto re-make. Thus borrowing
+# the idea from ​​fixdep (record the command for compiling object files and
+# FORCE check whether it's changed), we also record the LDFLAGS to a file
+# and FORCE check whether the LDFLAGS is different from the recorded one.
+SAVED_LDFLAGS = $(BUILD_DIR)/.saved_ldflags
+# Update the .saved_ldflags file whenever LDFLAGS changes
+$(SAVED_LDFLAGS): FORCE
+	@echo "$(LDFLAGS)" | cmp -s - $@ || echo "$(LDFLAGS)" > $@
+
 # Link all Object Files into BINARY_EXEC or BINARY_LIB_SHARED
 link_log = @echo "+ Link $@"
-link_cmd = $(CXX) $^ -o $@ $(LDFLAGS)
-$(BINARY_EXEC) $(BINARY_LIB_SHARED): $(OBJS)
+link_cmd = $(CXX) $(OBJS) -o $@ $(LDFLAGS)
+$(BINARY_EXEC) $(BINARY_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
 	$(link_log)
 	$(Q)$(link_cmd)
+
+##### Archive #####
 
 # Archive all Object Files into BINARY_LIB_STATIC
 archive_log = @echo "+ AR $@"
@@ -226,7 +246,7 @@ all: $(BINARY_EXEC) $(BINARY_LIB_STATIC) $(BINARY_LIB_SHARED)
 PHONY += all
 
 run: $(BINARY_EXEC)
-	@$(BINARY_EXEC)
+	$(Q)$(BINARY_EXEC)
 PHONY += run
 
 memcheck: $(BINARY_EXEC)
@@ -299,12 +319,12 @@ PHONY += uninstall
 
 help::
 	@echo 'Main Targets:'
-	@echo '    all          - compile (default target)'
+	@echo '    all          - build all (default target)'
 	@echo '                   build BINARY_EXEC if STATIC && SHARED not set (default)'
 	@echo '                   build BINARY_LIB_STATIC if STATIC=1'
 	@echo '                   build BINARY_LIB_SHARED if SHARED=1'
-	@echo '    run          - compile BINARY_EXEC and run'
-	@echo '    memcheck     - compile BINARY_EXEC and memcheck'
+	@echo '    run          - build BINARY_EXEC and run'
+	@echo '    memcheck     - build BINARY_EXEC and memcheck'
 	@echo 'Install Targets:'
 	@echo '    install      - install to system'
 	@echo '                   install BINARY_EXEC if STATIC && SHARED not set (default)'
