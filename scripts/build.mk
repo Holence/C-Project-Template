@@ -256,9 +256,9 @@ run: $(TARGET_EXEC)
 	$(Q)$(TARGET_EXEC)
 PHONY += run
 
-memcheck: $(TARGET_EXEC)
-	$(call run_memcheck, $(TARGET_EXEC))
-PHONY += memcheck
+valgrind: $(TARGET_EXEC)
+	$(call run_valgrind, $(TARGET_EXEC))
+PHONY += valgrind
 
 # clean build dir
 clean:
@@ -331,7 +331,7 @@ help::
 	@echo '                   build TARGET_LIB_STATIC if STATIC=1'
 	@echo '                   build TARGET_LIB_SHARED if SHARED=1'
 	@echo '    run          - build TARGET_EXEC and run'
-	@echo '    memcheck     - build TARGET_EXEC and memcheck'
+	@echo '    valgrind     - build TARGET_EXEC and run valgrind'
 	@echo 'Install Targets:'
 	@echo '    install      - install to system'
 	@echo '                   install TARGET_EXEC if STATIC && SHARED not set (default)'

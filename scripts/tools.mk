@@ -6,8 +6,8 @@ find_srcs = $(shell find $1 -name '*.cpp' -or -name '*.c' -or -name '*.s' -or -n
 # Find all folders recursively (also follow symlinks)
 find_dirs = $(shell find $1 -type d -follow)
 
-# run memcheck
-define run_memcheck
+# run valgrind
+define run_valgrind
 	valgrind --show-error-list=yes --leak-check=full --show-leak-kinds=all --track-origins=yes $1
 endef
 
