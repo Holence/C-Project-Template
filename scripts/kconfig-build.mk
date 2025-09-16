@@ -327,7 +327,7 @@ $(SAVED_LDFLAGS): FORCE
 	@echo "$(LDFLAGS)" | cmp -s - $@ || echo "$(LDFLAGS)" > $@
 
 # Link all Object Files into BINARY_EXEC or BINARY_LIB_SHARED
-link_log = @echo "+ Link $@"
+link_log = @printf "$(ANSI_FG_GREEN)+ Link $@$(ANSI_NONE)\n"
 link_cmd = $(CXX) $(OBJS) -o $@ $(LDFLAGS)
 $(BINARY_EXEC) $(BINARY_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
 	$(link_log)
@@ -336,7 +336,7 @@ $(BINARY_EXEC) $(BINARY_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
 ##### Archive #####
 
 # Archive all Object Files into BINARY_LIB_STATIC
-archive_log = @echo "+ AR $@"
+archive_log = @printf "$(ANSI_FG_GREEN)+ AR $@$(ANSI_NONE)\n"
 archive_cmd = $(AR) rcs $@ $^
 $(BINARY_LIB_STATIC): $(OBJS)
 	$(archive_log)

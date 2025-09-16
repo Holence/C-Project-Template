@@ -122,9 +122,9 @@ CFLAGS += -O2
 # CFLAGS += -fdata-sections -ffunction-sections
 
 ## Sanitizers
-SAN_FLAGS += -fsanitize=undefined
-# SAN_FLAGS += -fsanitize=address # don't use these with valgrind
-# SAN_FLAGS += -fsanitize=leak # don't use these with valgrind
+# SAN_FLAGS += -fsanitize=undefined
+# SAN_FLAGS += -fsanitize=address # don't use this with valgrind
+# SAN_FLAGS += -fsanitize=leak # don't use this with valgrind
 # SAN_FLAGS += -fsanitize=thread # can't be combined with -fsanitize=address, -fsanitize=leak
 CFLAGS += $(SAN_FLAGS)
 
@@ -222,7 +222,7 @@ $(SAVED_LDFLAGS): FORCE
 	@echo "$(LDFLAGS)" | cmp -s - $@ || echo "$(LDFLAGS)" > $@
 
 # Link all Object Files into BINARY_EXEC or BINARY_LIB_SHARED
-link_log = @echo "+ Link $@"
+link_log = @printf "$(ANSI_FG_GREEN)+ Link $@$(ANSI_NONE)\n"
 link_cmd = $(CXX) $(OBJS) -o $@ $(LDFLAGS)
 $(BINARY_EXEC) $(BINARY_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
 	$(link_log)
@@ -231,7 +231,7 @@ $(BINARY_EXEC) $(BINARY_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
 ##### Archive #####
 
 # Archive all Object Files into BINARY_LIB_STATIC
-archive_log = @echo "+ AR $@"
+archive_log = @printf "$(ANSI_FG_GREEN)+ AR $@$(ANSI_NONE)\n"
 archive_cmd = $(AR) rcs $@ $^
 $(BINARY_LIB_STATIC): $(OBJS)
 	$(archive_log)
