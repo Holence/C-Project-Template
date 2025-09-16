@@ -67,7 +67,7 @@ SHARED ?=
 # - BINARY_EXEC -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/bin/
 # - BINARY_LIB_STATIC -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/lib/
 # - BINARY_LIB_SHARED -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/lib/
-# - ./include/* -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/include/*
+# - each file/folder in INSTALL_HEADERS -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/include/*
 # 
 # $(INSTALL_DESTDIR)$(INSTALL_PREFIX) default to /usr/local
 #   you can change INSTALL_DESTDIR, such as /tmp
@@ -75,6 +75,7 @@ SHARED ?=
 INSTALL_DESTDIR ?=
 INSTALL_PREFIX  ?= /usr/local
 INSTALL_DIR     = $(INSTALL_DESTDIR)$(INSTALL_PREFIX)
+INSTALL_HEADERS ?= $(shell find include -mindepth 1 -maxdepth 1 -not \( -path 'include/config' -o -path 'include/generated' \))
 
 ##### Config for Kconfig Tool #####
 # build kconfig tools from linux source code
@@ -419,7 +420,7 @@ endef
 # - /usr/local/bin/$(BINARY_EXEC)
 # - /usr/local/lib/$(BINARY_LIB_STATIC)
 # - /usr/local/lib/$(BINARY_LIB_SHARED)
-# - ./include/* to /usr/local/include/*
+# - each file/folder in INSTALL_HEADERS to /usr/local/include/*
 install: all
 ifneq ($(BINARY_EXEC),)
 	$(call __install,$(BINARY_EXEC),$(INSTALL_DIR)/bin/,755)
@@ -432,7 +433,7 @@ ifneq ($(BINARY_LIB_SHARED),)
 	ldconfig
 endif
 ifneq ($(BINARY_LIB_STATIC)$(BINARY_LIB_SHARED),)
-	$(foreach __file,$(shell find include -not \( -path 'include/config/*' -o -path 'include/generated/*' \) -type f),\
+	$(foreach __file,$(shell find $(INSTALL_HEADERS) -type f),\
 		$(call __install,$(__file),$(dir $(INSTALL_DIR)/$(__file)),644)$(newline)\
 	)
 endif
@@ -442,7 +443,7 @@ PHONY += install
 # - /usr/local/bin/$(BINARY_EXEC)
 # - /usr/local/lib/$(BINARY_LIB_STATIC)
 # - /usr/local/lib/$(BINARY_LIB_SHARED)
-# - ./include/* in /usr/local/include/*
+# - each file/folder in INSTALL_HEADERS in /usr/local/include/*
 uninstall:
 ifneq ($(BINARY_EXEC),)
 	-$(RM) -r $(INSTALL_DIR)/bin/$(notdir $(BINARY_EXEC))
@@ -455,7 +456,7 @@ ifneq ($(BINARY_LIB_SHARED),)
 	ldconfig
 endif
 ifneq ($(BINARY_LIB_STATIC)$(BINARY_LIB_SHARED),)
-	$(foreach __file,$(shell find include -mindepth 1 -maxdepth 1 -not \( -path 'include/config' -o -path 'include/generated' \)),\
+	$(foreach __file,$(INSTALL_HEADERS),\
 		-$(RM) -r $(INSTALL_DIR)/$(__file)$(newline)\
 	)
 endif
@@ -478,8 +479,10 @@ help::
 	@echo '                       default location: /usr/local/lib/'
 	@echo '                   install BINARY_LIB_SHARED if SHARED=1'
 	@echo '                       default location: /usr/local/lib/'
-	@echo '                   install ./include/* if STATIC || SHARED is set'
+	@echo '                   install each file/folder in INSTALL_HEADERS if STATIC || SHARED is set'
 	@echo '                       default location: /usr/local/include/*'
+	@echo '                       default INSTALL_HEADERS: each file/folder in ./include/, excluding
+	@echo                                                  include/config and include/generated
 	@echo '    uninstall    - remove installed files'
 	@echo ''
 	@echo '    Note: These targets require root permissions!'
@@ -514,6 +517,7 @@ $(call colored_print,$(ANSI_FG_BLACK),--------------- Config for Install -------
 $(call colored_print,$(ANSI_FG_BLACK),INSTALL_DESTDIR    : $(INSTALL_DESTDIR))
 $(call colored_print,$(ANSI_FG_BLACK),INSTALL_PREFIX     : $(INSTALL_PREFIX))
 $(call colored_print,$(ANSI_FG_BLACK),INSTALL_DIR        : $(INSTALL_DIR))
+$(call colored_print,$(ANSI_FG_BLACK),INSTALL_HEADERS    : $(INSTALL_HEADERS))
 $(call colored_print,$(ANSI_FG_BLACK),------------- Config for Kconfig Tool ------------)
 $(call colored_print,$(ANSI_FG_BLACK),CONF   : $(CONF))
 $(call colored_print,$(ANSI_FG_BLACK),MCONF  : $(MCONF))
