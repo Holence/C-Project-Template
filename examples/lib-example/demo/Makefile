@@ -1,5 +1,6 @@
 include scripts/setting.mk
 
+BUILD_DIR := build
 NAME := demo
 LDFLAGS += -lmymath
 

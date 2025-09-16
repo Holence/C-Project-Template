@@ -1,6 +1,7 @@
 include scripts/setting.mk
 include scripts/tools.mk
 
+BUILD_DIR := build
 NAME := full-example
 SRCS := $(call find_srcs, src)
 INC_DIRS := ./include/

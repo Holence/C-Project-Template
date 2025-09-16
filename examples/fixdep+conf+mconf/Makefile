@@ -15,6 +15,7 @@ clean-all:
 	@$(MAKE) -f fixdep.mk clean-all
 	@$(MAKE) -f kconfig.mk NAME=conf clean-all
 	@$(MAKE) -f kconfig.mk NAME=mconf clean-all
+	-$(RM) -r build
 
 install:
 	@$(MAKE) -s -f fixdep.mk install

@@ -40,6 +40,11 @@ SRCS ?= $(call find_srcs, .)
 
 # the building dir
 # default value: ./build/$(NAME)
+# note: Add another subfolder $(NAME) is just a conservative way to
+#       prevent mixing of built files (in some rare cases, a makefile
+#       is used to build multiple target by changing $(NAME)). If you
+#       only have one build target, you can simply define
+#       BUILD_DIR := ./build
 BUILD_DIR ?= ./build/$(NAME)
 
 # all the dirs for searching header files
