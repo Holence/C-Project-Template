@@ -229,7 +229,7 @@ $(SAVED_LDFLAGS): FORCE
 	@echo "$(LDFLAGS)" | cmp -s - $@ || echo "$(LDFLAGS)" > $@
 
 # Link all Object Files into TARGET_EXEC or TARGET_LIB_SHARED
-link_log = @printf "$(ANSI_FG_GREEN)+ Link $@$(ANSI_NONE)\n"
+link_log = @$(call print_ansi_fg_green,+ Link $@)
 link_cmd = $(CXX) $(OBJS) -o $@ $(LDFLAGS)
 $(TARGET_EXEC) $(TARGET_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
 	$(link_log)
@@ -238,7 +238,7 @@ $(TARGET_EXEC) $(TARGET_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
 ##### Archive #####
 
 # Archive all Object Files into TARGET_LIB_STATIC
-archive_log = @printf "$(ANSI_FG_GREEN)+ AR $@$(ANSI_NONE)\n"
+archive_log = @$(call print_ansi_fg_green,+ AR $@)
 archive_cmd = $(AR) rcs $@ $^
 $(TARGET_LIB_STATIC): $(OBJS)
 	$(archive_log)
@@ -275,7 +275,7 @@ PHONY += clean-all
 define __install
 	$(Q)install -d $2
 	$(Q)install -m$3 $1 $2
-	@printf "$(ANSI_FG_GREEN)+ Install $$(ls $2$(notdir $1))$(ANSI_NONE)\n"
+	@$(call print_ansi_fg_green,+ Install $$(ls $2$(notdir $1)))
 endef
 
 # Install to system
@@ -359,37 +359,37 @@ PHONY += help
 .PHONY: $(PHONY)
 
 ifneq ($(findstring 1, $V),)
-$(call colored_print,$(ANSI_FG_BLACK),================= Custom Config ==================)
-$(call colored_print,$(ANSI_FG_BLACK),--------------- Config for Build -----------------)
-$(call colored_print,$(ANSI_FG_BLACK),NAME      : $(NAME))
-$(call colored_print,$(ANSI_FG_BLACK),SRCS      : $(SRCS))
-$(call colored_print,$(ANSI_FG_BLACK),BUILD_DIR : $(BUILD_DIR))
-$(call colored_print,$(ANSI_FG_BLACK),INC_DIRS  : $(INC_DIRS))
-$(call colored_print,$(ANSI_FG_BLACK),--------------- Config for Build LIB -------------)
-$(call colored_print,$(ANSI_FG_BLACK),STATIC : $(STATIC))
-$(call colored_print,$(ANSI_FG_BLACK),SHARED : $(SHARED))
-$(call colored_print,$(ANSI_FG_BLACK),--------------- Config for Install ---------------)
-$(call colored_print,$(ANSI_FG_BLACK),INSTALL_DESTDIR    : $(INSTALL_DESTDIR))
-$(call colored_print,$(ANSI_FG_BLACK),INSTALL_PREFIX     : $(INSTALL_PREFIX))
-$(call colored_print,$(ANSI_FG_BLACK),INSTALL_DIR        : $(INSTALL_DIR))
-$(call colored_print,$(ANSI_FG_BLACK),INSTALL_HEADERS    : $(INSTALL_HEADERS))
-$(call colored_print,$(ANSI_FG_BLACK),================= Generated Vars =================)
-$(call colored_print,$(ANSI_FG_BLACK),TARGET_EXEC       : $(TARGET_EXEC))
-$(call colored_print,$(ANSI_FG_BLACK),TARGET_LIB_STATIC : $(TARGET_LIB_STATIC))
-$(call colored_print,$(ANSI_FG_BLACK),TARGET_LIB_SHARED : $(TARGET_LIB_SHARED))
-$(call colored_print,$(ANSI_FG_BLACK),OBJS              : $(OBJS))
-$(call colored_print,$(ANSI_FG_BLACK),INC_FLAGS         : $(INC_FLAGS))
-$(call colored_print,$(ANSI_FG_BLACK),================ Common variables ================)
-$(call colored_print,$(ANSI_FG_BLACK),AS  : $(AS))
-$(call colored_print,$(ANSI_FG_BLACK),CC  : $(CC))
-$(call colored_print,$(ANSI_FG_BLACK),CXX : $(CXX))
-$(call colored_print,$(ANSI_FG_BLACK),AR  : $(AR))
-$(call colored_print,$(ANSI_FG_BLACK),RM  : $(RM))
-$(call colored_print,$(ANSI_FG_BLACK),====================== Flags =====================)
-$(call colored_print,$(ANSI_FG_BLACK),CPPFLAGS : $(CPPFLAGS))
-$(call colored_print,$(ANSI_FG_BLACK),CFLAGS   : $(CFLAGS))
-$(call colored_print,$(ANSI_FG_BLACK),CXXFLAGS : $(CXXFLAGS))
-$(call colored_print,$(ANSI_FG_BLACK),LDFLAGS  : $(LDFLAGS))
-$(call colored_print,$(ANSI_FG_BLACK),====================== DEPS ======================)
-$(call colored_print,$(ANSI_FG_BLACK),DEPS : $(DEPS))
+$(call colored_info,$(ANSI_FG_BLACK),================= Custom Config ==================)
+$(call colored_info,$(ANSI_FG_BLACK),--------------- Config for Build -----------------)
+$(call colored_info,$(ANSI_FG_BLACK),NAME      : $(NAME))
+$(call colored_info,$(ANSI_FG_BLACK),SRCS      : $(SRCS))
+$(call colored_info,$(ANSI_FG_BLACK),BUILD_DIR : $(BUILD_DIR))
+$(call colored_info,$(ANSI_FG_BLACK),INC_DIRS  : $(INC_DIRS))
+$(call colored_info,$(ANSI_FG_BLACK),--------------- Config for Build LIB -------------)
+$(call colored_info,$(ANSI_FG_BLACK),STATIC : $(STATIC))
+$(call colored_info,$(ANSI_FG_BLACK),SHARED : $(SHARED))
+$(call colored_info,$(ANSI_FG_BLACK),--------------- Config for Install ---------------)
+$(call colored_info,$(ANSI_FG_BLACK),INSTALL_DESTDIR    : $(INSTALL_DESTDIR))
+$(call colored_info,$(ANSI_FG_BLACK),INSTALL_PREFIX     : $(INSTALL_PREFIX))
+$(call colored_info,$(ANSI_FG_BLACK),INSTALL_DIR        : $(INSTALL_DIR))
+$(call colored_info,$(ANSI_FG_BLACK),INSTALL_HEADERS    : $(INSTALL_HEADERS))
+$(call colored_info,$(ANSI_FG_BLACK),================= Generated Vars =================)
+$(call colored_info,$(ANSI_FG_BLACK),TARGET_EXEC       : $(TARGET_EXEC))
+$(call colored_info,$(ANSI_FG_BLACK),TARGET_LIB_STATIC : $(TARGET_LIB_STATIC))
+$(call colored_info,$(ANSI_FG_BLACK),TARGET_LIB_SHARED : $(TARGET_LIB_SHARED))
+$(call colored_info,$(ANSI_FG_BLACK),OBJS              : $(OBJS))
+$(call colored_info,$(ANSI_FG_BLACK),INC_FLAGS         : $(INC_FLAGS))
+$(call colored_info,$(ANSI_FG_BLACK),================ Common variables ================)
+$(call colored_info,$(ANSI_FG_BLACK),AS  : $(AS))
+$(call colored_info,$(ANSI_FG_BLACK),CC  : $(CC))
+$(call colored_info,$(ANSI_FG_BLACK),CXX : $(CXX))
+$(call colored_info,$(ANSI_FG_BLACK),AR  : $(AR))
+$(call colored_info,$(ANSI_FG_BLACK),RM  : $(RM))
+$(call colored_info,$(ANSI_FG_BLACK),====================== Flags =====================)
+$(call colored_info,$(ANSI_FG_BLACK),CPPFLAGS : $(CPPFLAGS))
+$(call colored_info,$(ANSI_FG_BLACK),CFLAGS   : $(CFLAGS))
+$(call colored_info,$(ANSI_FG_BLACK),CXXFLAGS : $(CXXFLAGS))
+$(call colored_info,$(ANSI_FG_BLACK),LDFLAGS  : $(LDFLAGS))
+$(call colored_info,$(ANSI_FG_BLACK),====================== DEPS ======================)
+$(call colored_info,$(ANSI_FG_BLACK),DEPS : $(DEPS))
 endif

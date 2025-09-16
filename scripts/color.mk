@@ -39,12 +39,8 @@ print_ansi_bg_magenta = printf "$(ANSI_BG_MAGENTA)$1$(ANSI_NONE)\n"
 print_ansi_bg_cyan    = printf "$(ANSI_BG_CYAN)$1$(ANSI_NONE)\n"
 print_ansi_bg_white   = printf "$(ANSI_BG_WHITE)$1$(ANSI_NONE)\n"
 
-define colored_print
-	$(info $(shell printf "$1$2$(ANSI_NONE)\n"))
-endef
-
 define colored_info
-	$(info $(shell $(call print_ansi_fg_blue,$1)))
+	$(info $(shell printf "$1$2$(ANSI_NONE)\n"))
 endef
 
 define colored_warning
