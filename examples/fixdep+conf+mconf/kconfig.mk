@@ -5,11 +5,11 @@ include scripts/color.mk
 # check $(NAME)
 ifeq ($(findstring clean,$(MAKECMDGOALS))$(filter help,$(MAKECMDGOALS)),)
 ifeq ($(NAME),conf)
+SRCS := $(filter-out kconfig/mconf.c $(call find_srcs, kconfig/lxdialog), $(call find_srcs, kconfig))
 INC_DIRS := ./include/ ./kconfig/
-SRCS := $(filter-out kconfig/mconf.c, $(call find_srcs, kconfig))
 else ifeq ($(NAME),mconf)
 SRCS := $(filter-out kconfig/conf.c, $(call find_srcs, kconfig))
-INC_DIRS := ./include/ ./kconfig/ ./kconfig/lxdialog
+INC_DIRS := ./include/ ./kconfig/ ./kconfig/lxdialog/
 LDFLAGS += -lncursesw -ltinfo
 else
 $(call colored_error,$(NAME) should be either "conf" or "mconf")
@@ -20,18 +20,13 @@ endif
 # - kconfig/lexer.lex.c
 # - kconfig/parser.tab.c
 # - kconfig/parser.tab.h
-generated := kconfig/lexer.lex.c kconfig/parser.tab.c
-# when build first time, $(generated) are not in SRCS, so manually add them
-# (sort is used for remove duplication for build after first time)
-SRCS := $(sort $(SRCS) $(generated))
-# let other .c files depend on them
-$(filter-out $(generated), $(SRCS)): $(generated)
-# rules for building $(generated)
-# you can run `make menuconfig -nB` in linux source
-# to see how to generate $(generated)
-kconfig/lexer.lex.c: kconfig/parser.tab.c
+# sort is used for remove duplication when these two files are already built
+SRCS := $(sort $(SRCS) kconfig/lexer.lex.c kconfig/parser.tab.c)
+kconfig/lexer.lex.c: kconfig/lexer.l kconfig/parser.tab.h
+	@echo + LEX $@
 	flex -o $@ -L kconfig/lexer.l
-kconfig/parser.tab.c:
+kconfig/parser.tab.c kconfig/parser.tab.h: kconfig/parser.y
+	@echo + YACC $@
 	bison -o kconfig/parser.tab.c --defines=kconfig/parser.tab.h -t -l kconfig/parser.y
 
 # these code even cannot pass -Werror ?!!
