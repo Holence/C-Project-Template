@@ -216,7 +216,7 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 # the idea from ​​fixdep (record the command for compiling object files and
 # FORCE check whether it's changed), we also record the LDFLAGS to a file
 # and FORCE check whether the LDFLAGS is different from the recorded one.
-SAVED_LDFLAGS = $(BUILD_DIR)/.saved_ldflags
+SAVED_LDFLAGS = $(BUILD_DIR)/$(NAME).saved_ldflags
 # Update the .saved_ldflags file whenever LDFLAGS changes
 $(SAVED_LDFLAGS): FORCE
 	@echo "$(LDFLAGS)" | cmp -s - $@ || echo "$(LDFLAGS)" > $@
