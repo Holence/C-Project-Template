@@ -48,8 +48,8 @@ NAME ?= main
 SRCS ?= $(call find_srcs, .)
 
 # the building dir
-# default value: ./build
-BUILD_DIR ?= ./build
+# default value: ./build/$(NAME)
+BUILD_DIR ?= ./build/$(NAME)
 
 # all the dirs for searching header files
 # will be used as -I flags for compiling
@@ -321,9 +321,10 @@ $(BUILD_DIR)/%.cpp.o: %.cpp FORCE
 # the idea from ​​fixdep (record the command for compiling object files and
 # FORCE check whether it's changed), we also record the LDFLAGS to a file
 # and FORCE check whether the LDFLAGS is different from the recorded one.
-SAVED_LDFLAGS = $(BUILD_DIR)/$(NAME).saved_ldflags
+SAVED_LDFLAGS = $(BUILD_DIR)/.saved_ldflags
 # Update the .saved_ldflags file whenever LDFLAGS changes
 $(SAVED_LDFLAGS): FORCE
+	$(Q)mkdir -p $(dir $@)
 	@echo "$(LDFLAGS)" | cmp -s - $@ || echo "$(LDFLAGS)" > $@
 
 # Link all Object Files into BINARY_EXEC or BINARY_LIB_SHARED
