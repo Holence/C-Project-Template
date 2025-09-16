@@ -38,7 +38,7 @@ else
 endif
 
 ##### Config for Build #####
-# the name of "Binary File"
+# the name of TARGET
 # default value: main
 NAME ?= main
 
@@ -69,9 +69,9 @@ SHARED ?=
 # To install to your system  
 
 # default install location:
-# - BINARY_EXEC -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/bin/
-# - BINARY_LIB_STATIC -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/lib/
-# - BINARY_LIB_SHARED -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/lib/
+# - TARGET_EXEC -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/bin/
+# - TARGET_LIB_STATIC -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/lib/
+# - TARGET_LIB_SHARED -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/lib/
 # - each file/folder in INSTALL_HEADERS -> $(INSTALL_DESTDIR)$(INSTALL_PREFIX)/include/*
 # 
 # $(INSTALL_DESTDIR)$(INSTALL_PREFIX) default to /usr/local
@@ -98,22 +98,22 @@ FIXDEP ?= fixdep
 #        Generated Vars        #
 ################################
 # Generated Vars using Custom Config
-# NAME -> BINARY
+# NAME -> TARGET
 # SRCS -> OBJS
 # INC_DIRS -> INC_FLAGS
 
-# the "Binary File"
+# the TARGET
 ## build executable file only if STATIC && SHARED not set
 ifeq ($(STATIC)$(SHARED),)
-BINARY_EXEC = $(BUILD_DIR)/$(NAME)
+TARGET_EXEC = $(BUILD_DIR)/$(NAME)
 endif
 ## build static library (archive file) if STATIC=1
 ifeq ($(STATIC),1)
-BINARY_LIB_STATIC = $(BUILD_DIR)/lib$(NAME).a
+TARGET_LIB_STATIC = $(BUILD_DIR)/lib$(NAME).a
 endif
 ## build dynamic library (shared object file) if SHARED=1
 ifeq ($(SHARED),1)
-BINARY_LIB_SHARED = $(BUILD_DIR)/lib$(NAME).so
+TARGET_LIB_SHARED = $(BUILD_DIR)/lib$(NAME).so
 endif
 
 # Prepends BUILD_DIR and appends .o to every src file
@@ -333,19 +333,19 @@ $(SAVED_LDFLAGS): FORCE
 	$(Q)mkdir -p $(dir $@)
 	@echo "$(LDFLAGS)" | cmp -s - $@ || echo "$(LDFLAGS)" > $@
 
-# Link all Object Files into BINARY_EXEC or BINARY_LIB_SHARED
+# Link all Object Files into TARGET_EXEC or TARGET_LIB_SHARED
 link_log = @printf "$(ANSI_FG_GREEN)+ Link $@$(ANSI_NONE)\n"
 link_cmd = $(CXX) $(OBJS) -o $@ $(LDFLAGS)
-$(BINARY_EXEC) $(BINARY_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
+$(TARGET_EXEC) $(TARGET_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
 	$(link_log)
 	$(Q)$(link_cmd)
 
 ##### Archive #####
 
-# Archive all Object Files into BINARY_LIB_STATIC
+# Archive all Object Files into TARGET_LIB_STATIC
 archive_log = @printf "$(ANSI_FG_GREEN)+ AR $@$(ANSI_NONE)\n"
 archive_cmd = $(AR) rcs $@ $^
-$(BINARY_LIB_STATIC): $(OBJS)
+$(TARGET_LIB_STATIC): $(OBJS)
 	$(archive_log)
 	$(Q)$(archive_cmd)
 
@@ -387,15 +387,15 @@ $(__kconfig_auto_generated): .config
 	fi
 
 .DEFAULT_GOAL = all
-all: $(BINARY_EXEC) $(BINARY_LIB_STATIC) $(BINARY_LIB_SHARED)
+all: $(TARGET_EXEC) $(TARGET_LIB_STATIC) $(TARGET_LIB_SHARED)
 PHONY += all
 
-run: $(BINARY_EXEC)
-	$(Q)$(BINARY_EXEC)
+run: $(TARGET_EXEC)
+	$(Q)$(TARGET_EXEC)
 PHONY += run
 
-memcheck: $(BINARY_EXEC)
-	$(call run_memcheck, $(BINARY_EXEC))
+memcheck: $(TARGET_EXEC)
+	$(call run_memcheck, $(TARGET_EXEC))
 PHONY += memcheck
 
 # clean build dir
@@ -422,22 +422,22 @@ define __install
 endef
 
 # Install to system
-# - /usr/local/bin/$(BINARY_EXEC)
-# - /usr/local/lib/$(BINARY_LIB_STATIC)
-# - /usr/local/lib/$(BINARY_LIB_SHARED)
+# - /usr/local/bin/$(TARGET_EXEC)
+# - /usr/local/lib/$(TARGET_LIB_STATIC)
+# - /usr/local/lib/$(TARGET_LIB_SHARED)
 # - each file/folder in INSTALL_HEADERS to /usr/local/include/*
 install: all
-ifneq ($(BINARY_EXEC),)
-	$(call __install,$(BINARY_EXEC),$(INSTALL_DIR)/bin/,755)
+ifneq ($(TARGET_EXEC),)
+	$(call __install,$(TARGET_EXEC),$(INSTALL_DIR)/bin/,755)
 endif
-ifneq ($(BINARY_LIB_STATIC),)
-	$(call __install,$(BINARY_LIB_STATIC),$(INSTALL_DIR)/lib/,644)
+ifneq ($(TARGET_LIB_STATIC),)
+	$(call __install,$(TARGET_LIB_STATIC),$(INSTALL_DIR)/lib/,644)
 endif
-ifneq ($(BINARY_LIB_SHARED),)
-	$(call __install,$(BINARY_LIB_SHARED),$(INSTALL_DIR)/lib/,644)
+ifneq ($(TARGET_LIB_SHARED),)
+	$(call __install,$(TARGET_LIB_SHARED),$(INSTALL_DIR)/lib/,644)
 	ldconfig
 endif
-ifneq ($(BINARY_LIB_STATIC)$(BINARY_LIB_SHARED),)
+ifneq ($(TARGET_LIB_STATIC)$(TARGET_LIB_SHARED),)
 	$(foreach __file,$(shell find $(INSTALL_HEADERS) -type f),\
 		$(call __install,$(__file),$(dir $(INSTALL_DIR)/$(__file)),644)$(newline)\
 	)
@@ -445,22 +445,22 @@ endif
 PHONY += install
 
 # Remove installed files
-# - /usr/local/bin/$(BINARY_EXEC)
-# - /usr/local/lib/$(BINARY_LIB_STATIC)
-# - /usr/local/lib/$(BINARY_LIB_SHARED)
+# - /usr/local/bin/$(TARGET_EXEC)
+# - /usr/local/lib/$(TARGET_LIB_STATIC)
+# - /usr/local/lib/$(TARGET_LIB_SHARED)
 # - each file/folder in INSTALL_HEADERS in /usr/local/include/*
 uninstall:
-ifneq ($(BINARY_EXEC),)
-	-$(RM) -r $(INSTALL_DIR)/bin/$(notdir $(BINARY_EXEC))
+ifneq ($(TARGET_EXEC),)
+	-$(RM) -r $(INSTALL_DIR)/bin/$(notdir $(TARGET_EXEC))
 endif
-ifneq ($(BINARY_LIB_STATIC),)
-	-$(RM) -r $(INSTALL_DIR)/lib/$(notdir $(BINARY_LIB_STATIC))
+ifneq ($(TARGET_LIB_STATIC),)
+	-$(RM) -r $(INSTALL_DIR)/lib/$(notdir $(TARGET_LIB_STATIC))
 endif
-ifneq ($(BINARY_LIB_SHARED),)
-	-$(RM) -r $(INSTALL_DIR)/lib/$(notdir $(BINARY_LIB_SHARED))
+ifneq ($(TARGET_LIB_SHARED),)
+	-$(RM) -r $(INSTALL_DIR)/lib/$(notdir $(TARGET_LIB_SHARED))
 	ldconfig
 endif
-ifneq ($(BINARY_LIB_STATIC)$(BINARY_LIB_SHARED),)
+ifneq ($(TARGET_LIB_STATIC)$(TARGET_LIB_SHARED),)
 	$(foreach __file,$(INSTALL_HEADERS),\
 		-$(RM) -r $(INSTALL_DIR)/$(__file)$(newline)\
 	)
@@ -471,18 +471,18 @@ help::
 	@echo 'Main Targets:'
 	@echo '    menuconfig   - edit kconfig'
 	@echo '    all          - build all (default target)'
-	@echo '                   build BINARY_EXEC if STATIC && SHARED not set (default)'
-	@echo '                   build BINARY_LIB_STATIC if STATIC=1'
-	@echo '                   build BINARY_LIB_SHARED if SHARED=1'
-	@echo '    run          - build BINARY_EXEC and run'
-	@echo '    memcheck     - build BINARY_EXEC and memcheck'
+	@echo '                   build TARGET_EXEC if STATIC && SHARED not set (default)'
+	@echo '                   build TARGET_LIB_STATIC if STATIC=1'
+	@echo '                   build TARGET_LIB_SHARED if SHARED=1'
+	@echo '    run          - build TARGET_EXEC and run'
+	@echo '    memcheck     - build TARGET_EXEC and memcheck'
 	@echo 'Install Targets:'
 	@echo '    install      - install to system'
-	@echo '                   install BINARY_EXEC if STATIC && SHARED not set (default)'
+	@echo '                   install TARGET_EXEC if STATIC && SHARED not set (default)'
 	@echo '                       default location: /usr/local/bin/'
-	@echo '                   install BINARY_LIB_STATIC if STATIC=1'
+	@echo '                   install TARGET_LIB_STATIC if STATIC=1'
 	@echo '                       default location: /usr/local/lib/'
-	@echo '                   install BINARY_LIB_SHARED if SHARED=1'
+	@echo '                   install TARGET_LIB_SHARED if SHARED=1'
 	@echo '                       default location: /usr/local/lib/'
 	@echo '                   install each file/folder in INSTALL_HEADERS if STATIC || SHARED is set'
 	@echo '                       default location: /usr/local/include/*'
@@ -528,9 +528,9 @@ $(call colored_print,$(ANSI_FG_BLACK),CONF   : $(CONF))
 $(call colored_print,$(ANSI_FG_BLACK),MCONF  : $(MCONF))
 $(call colored_print,$(ANSI_FG_BLACK),FIXDEP : $(FIXDEP))
 $(call colored_print,$(ANSI_FG_BLACK),================= Generated Vars =================)
-$(call colored_print,$(ANSI_FG_BLACK),BINARY_EXEC       : $(BINARY_EXEC))
-$(call colored_print,$(ANSI_FG_BLACK),BINARY_LIB_STATIC : $(BINARY_LIB_STATIC))
-$(call colored_print,$(ANSI_FG_BLACK),BINARY_LIB_SHARED : $(BINARY_LIB_SHARED))
+$(call colored_print,$(ANSI_FG_BLACK),TARGET_EXEC       : $(TARGET_EXEC))
+$(call colored_print,$(ANSI_FG_BLACK),TARGET_LIB_STATIC : $(TARGET_LIB_STATIC))
+$(call colored_print,$(ANSI_FG_BLACK),TARGET_LIB_SHARED : $(TARGET_LIB_SHARED))
 $(call colored_print,$(ANSI_FG_BLACK),OBJS              : $(OBJS))
 $(call colored_print,$(ANSI_FG_BLACK),INC_FLAGS         : $(INC_FLAGS))
 $(call colored_print,$(ANSI_FG_BLACK),================ Common variables ================)
