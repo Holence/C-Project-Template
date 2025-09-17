@@ -548,10 +548,10 @@ $(call colored_info,$(ANSI_FG_BLACK),====================== DEPS ===============
 $(call colored_info,$(ANSI_FG_BLACK),DEPS : $(DEPS))
 endif
 
-# if not running `make clean...` or `make help` or `make menuconfig`
+# if not running `make clean...` or `make help` or `make menuconfig` or `make uninstall`
 #   and if .config does not exist
 #     then quit
-ifeq ($(findstring clean,$(MAKECMDGOALS))$(filter help menuconfig,$(MAKECMDGOALS)),)
+ifeq ($(findstring clean,$(MAKECMDGOALS))$(filter help menuconfig uninstall,$(MAKECMDGOALS)),)
 ifeq ($(wildcard .config),)
 $(call colored_warning,WARNING: .config does not exist!)
 $(call colored_error,To build the project$(comma) first run 'make menuconfig')
