@@ -12,7 +12,7 @@ SRCS := $(filter-out kconfig/conf.c, $(call find_srcs, kconfig))
 INC_DIRS := ./include/ ./kconfig/ ./kconfig/lxdialog/
 LDFLAGS += -lncursesw -ltinfo
 else
-$(call colored_error,$(NAME) should be either "conf" or "mconf")
+$(call colored_error,NAME should be either "conf" or "mconf")
 endif
 endif
 
@@ -34,9 +34,7 @@ CFLAGS += -w
 
 include scripts/build.mk
 
-clean-gernerated:
+clean-all:
 	-$(RM) kconfig/lexer.lex.c
 	-$(RM) kconfig/parser.tab.c
 	-$(RM) kconfig/parser.tab.h
-.PHONY: clean-gernerated
-clean-all: clean-gernerated
