@@ -486,8 +486,8 @@ help::
 	@echo '                       default location: /usr/local/lib/'
 	@echo '                   install each file/folder in INSTALL_HEADERS if STATIC || SHARED is set'
 	@echo '                       default location: /usr/local/include/*'
-	@echo '                       default INSTALL_HEADERS: each file/folder in ./include/, excluding
-	@echo                                                  include/config and include/generated
+	@echo '                       default INSTALL_HEADERS: each file/folder in ./include/, excluding'
+	@echo '                                                include/config and include/generated'
 	@echo '    uninstall    - remove installed files'
 	@echo ''
 	@echo '    Note: These targets require root permissions!'
