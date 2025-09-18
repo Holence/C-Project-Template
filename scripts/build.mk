@@ -118,7 +118,7 @@ CPPFLAGS = $(INC_FLAGS) -MMD -MP
 CFLAGS += -Wall -Werror -Wextra -Wpedantic
 CFLAGS += -Wno-unused-function -Wno-unused-parameter
 CFLAGS += -Wno-format
-CFLAGS += -Wstrict-aliasing=2 -Wstrict-overflow=5
+CFLAGS += -Wstrict-aliasing -Wstrict-overflow
 
 ## compile option
 CFLAGS += -O2
