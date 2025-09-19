@@ -24,15 +24,15 @@ LDFLAGS += -lfl
 # Bison generates parser .tab.c and .tab.h
 %.tab.c: %.y
 	@echo "+ YACC $< -> $@"
-	$(Q)$(BISON) --no-lines --debug -o $(BISON_C) $<
+	$(Q)$(BISON) --no-lines $(BISON_FLAGS) -o $(BISON_C) $<
 %.tab.h: %.y
 	@echo "+ YACC $< -> $@"
-	$(Q)$(BISON) --header=$(BISON_H) $< -o /dev/null
+	$(Q)$(BISON) --header=$(BISON_H) $(BISON_FLAGS) $< -o /dev/null
 
 # Flex generates .lex.c
 %.lex.c: %.l $(BISON_H)
 	@echo "+ LEX $< -> $@"
-	$(Q)$(FLEX) --noline -o $@ $<
+	$(Q)$(FLEX) --noline $(FLEX_FLAGS) -o $@ $<
 
 clean::
 	-$(RM) $(FLEX_C) $(BISON_C) $(BISON_H)

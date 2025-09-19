@@ -20,6 +20,7 @@ endif
 
 FLEX_SRC = kconfig/lexer.l
 BISON_SRC = kconfig/parser.y
+BISON_FLAGS += --debug
 include scripts/addon/flex-bison.mk
 
 # these code even cannot pass -Werror ?!!
