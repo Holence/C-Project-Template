@@ -14,8 +14,9 @@ LIST="""
     Kconfig.compiler
     setting.mk
     tools.mk
+    addon/flex-bison.mk
 """
 for FILE in $LIST
 do
-    wget --directory-prefix scripts/ https://raw.githubusercontent.com/Holence/C-Project-Template/refs/heads/main/scripts/"$FILE"
+    wget --directory-prefix scripts/"$(dirname "$FILE")" https://raw.githubusercontent.com/Holence/C-Project-Template/refs/heads/main/scripts/"$FILE"
 done
