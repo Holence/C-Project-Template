@@ -37,6 +37,12 @@ NAME ?= main
 # will be compiled into object files using compiler, see "Recipes"
 # default value: all srcs under current working directory
 SRCS ?= $(call find_srcs, .)
+# translate to relative path, and remove duplicated
+SRCS := $(sort $(foreach __file,$(SRCS),$(shell realpath --relative-to . $(__file))))
+ifneq ($(findstring ../, $(SRCS)),)
+$(call colored_warning,SRCS: $(SRCS))
+$(call colored_error,SRCS contain file outside current dir$(comma) this is not acceptable)
+endif
 
 # the building dir
 # default value: ./build/$(NAME)
@@ -100,7 +106,7 @@ endif
 OBJS = $(SRCS:%=$(BUILD_DIR)/%.o)
 
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
-INC_FLAGS = $(addprefix -I,$(INC_DIRS))
+INC_FLAGS += $(addprefix -I,$(INC_DIRS))
 
 ################################
 #            Flags             #
@@ -111,7 +117,7 @@ INC_FLAGS = $(addprefix -I,$(INC_DIRS))
 # C PreProcessor Flags
 # The -MMD and -MP flags will let gcc generate .d files
 # which will be used by Makefile (see `-include $(DEPS)`)
-CPPFLAGS = $(INC_FLAGS) -MMD -MP
+CPPFLAGS += $(INC_FLAGS) -MMD -MP
 
 # C Compiler Flags
 ## warning option
@@ -245,7 +251,7 @@ $(TARGET_LIB_STATIC): $(OBJS)
 	$(Q)$(archive_cmd)
 
 ################################
-#            Rules             #
+#            Target            #
 ################################
 
 .DEFAULT_GOAL = all
@@ -261,12 +267,12 @@ valgrind: $(TARGET_EXEC)
 PHONY += valgrind
 
 # clean build dir
-clean:
+clean::
 	-$(RM) -r $(BUILD_DIR)
 PHONY += clean
 
 # all clean targets
-clean-all: clean
+clean-all:: clean
 PHONY += clean-all
 
 # __install(file_path,dst_dir,permission_mode)

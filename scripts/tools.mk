@@ -1,10 +1,12 @@
 # Copyright (C) 2025 Holence <Holence08@gmail.com>
 
-# Find all the C/C++ files recursively  (also follow symlinks)
-find_srcs = $(shell find $1 -name '*.cpp' -or -name '*.c' -or -name '*.s' -or -name '*.S' -follow)
+# find_srcs(starting_point, extra_flags)
+# Find all the C/C++ files recursively
+find_srcs = $(shell find $1 $2 -name '*.cpp' -or -name '*.c' -or -name '*.s' -or -name '*.S')
 
-# Find all folders recursively (also follow symlinks)
-find_dirs = $(shell find $1 -type d -follow)
+# find_dirs(starting_point, extra_flags)
+# Find all folders recursively
+find_dirs = $(shell find $1 $2 -type d)
 
 # run valgrind
 define run_valgrind
