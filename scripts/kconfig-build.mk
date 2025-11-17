@@ -47,7 +47,7 @@ NAME ?= main
 # default value: all srcs under current working directory
 SRCS ?= $(call find_srcs, .)
 # translate to relative path, and remove duplicated
-SRCS := $(sort $(foreach __file,$(SRCS),$(shell realpath --relative-to . $(__file))))
+SRCS := $(sort $(foreach __file,$(SRCS),$(shell realpath --no-symlinks --relative-to . $(__file))))
 ifneq ($(findstring ../, $(SRCS)),)
 $(call colored_warning,SRCS: $(SRCS))
 $(call colored_error,SRCS contain file outside current dir$(comma) this is not acceptable)
