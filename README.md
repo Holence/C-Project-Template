@@ -9,7 +9,7 @@
 
 # Install
 
-To install fixdep/conf/mconf, just run `sudo make install` in `examples/fixdep-conf-mconf`🤗
+To install fixdep/conf/mconf, just run `sudo apt install flex bison libncurses-dev` then run `sudo make install` in `examples/fixdep-conf-mconf`🤗
 
 To download latest scripts into your project, just run this command:
 
