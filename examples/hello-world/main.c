@@ -1,6 +1,9 @@
 #include <stdio.h>
 
 int main(int argc, char const *argv[]) {
-    printf("Hello world");
+    printf("Hello world\n");
+    for (int i = 0; i < argc; i++) {
+        printf("argv[%d]: %s\n", i, argv[i]);
+    }
     return 0;
 }

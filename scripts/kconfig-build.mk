@@ -397,7 +397,7 @@ all: $(TARGET_EXEC) $(TARGET_LIB_STATIC) $(TARGET_LIB_SHARED)
 PHONY += all
 
 run: $(TARGET_EXEC)
-	$(Q)$(TARGET_EXEC)
+	$(Q)$(TARGET_EXEC) $(ARGS)
 PHONY += run
 
 valgrind: $(TARGET_EXEC)
