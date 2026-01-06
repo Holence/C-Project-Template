@@ -264,6 +264,10 @@ run: $(TARGET_EXEC)
 	$(Q)$(TARGET_EXEC) $(ARGS)
 PHONY += run
 
+gdb: $(TARGET_EXEC)
+	gdb $(TARGET_EXEC)
+PHONY += gdb
+
 valgrind: $(TARGET_EXEC)
 	$(call run_valgrind, $(TARGET_EXEC))
 PHONY += valgrind
@@ -339,6 +343,7 @@ help::
 	@echo '                   build TARGET_LIB_STATIC if STATIC=1'
 	@echo '                   build TARGET_LIB_SHARED if SHARED=1'
 	@echo '    run          - build TARGET_EXEC and run'
+	@echo '    gdb          - build TARGET_EXEC and run gdb'
 	@echo '    valgrind     - build TARGET_EXEC and run valgrind'
 	@echo 'Install Targets:'
 	@echo '    install      - install to system'
@@ -364,6 +369,8 @@ help::
 	@echo '    make V=1     - verbose'
 PHONY += help
 
+# Declare the contents of the PHONY variable as phony.  We keep that
+# information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)
 
 ifneq ($(findstring 1, $V),)
