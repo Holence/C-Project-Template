@@ -1,0 +1,15 @@
+menu "Debug"
+
+	config ENABLE_DEBUG_LOGGING
+			bool "Enable Debug related Logging"
+			default y
+			help
+				enable Log, Debug, Error in debug.h
+
+	config ENABLE_DEBUG_ASSERT
+			bool "Enable Debug related Assert"
+			default y
+			help
+				enable Assert, Require, TODO in debug.h
+
+endmenu

@@ -1,0 +1,126 @@
+#ifndef __MACRO_H__
+#define __MACRO_H__
+
+#include <stddef.h>
+#include <string.h>
+
+/// @brief get member size of struct
+/// @param struct_t struct type
+/// @param member member name
+#define member_size(struct_t, member) sizeof(((struct_t *)0)->member)
+
+#ifndef offsetof
+#define offsetof(struct_t, member) ((size_t)(&((struct_t *)0)->member))
+#endif
+
+/// @brief get member offset in struct
+/// @param struct_t struct type
+/// @param member member name
+#define member_offset(struct_t, member) offsetof(struct_t, member)
+
+/// @brief if you have the address of a struct's member, and you want to get the struct's address it belongs to
+/// @param ptr address of struct member
+/// @param struct_t struct type
+/// @param member member name
+#define container_of(ptr, struct_t, member) ((struct_t *)((char *)(ptr) - offsetof(struct_t, member)))
+
+// create a anonymous variable on stack
+#define ANONYMOUS_PTR(type, ...)    (&(type){__VA_ARGS__})
+#define ANONYMOUS_ARRAY(type, ...)  ((type[]){__VA_ARGS__})
+#define ANONYMOUS_STRUCT(type, ...) ((type){__VA_ARGS__})
+
+// macro stringizing
+// Why do I need double layer of indirection for macros? https://stackoverflow.com/a/8232426
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x)  STRINGIFY_(x)
+
+// strlen() for string constant
+#define STRLEN(CONST_STR) (sizeof(CONST_STR) - 1)
+
+// calculate the length of an array
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+
+// integer tool
+#define MIN(a, b)           ((a) < (b) ? (a) : (b))
+#define MAX(a, b)           ((a) > (b) ? (a) : (b))
+#define ABS(x)              ((x) < 0 ? -(x) : (x))
+#define CLAMP(x, low, high) ((x) < (low) ? (low) : ((x) > (high) ? (high) : (x)))
+
+// floating-point number tool
+#define FLOAT_EQUAL(a, b)  (ABS((a) - (b)) < 1e-6f)
+#define DOUBLE_EQUAL(a, b) (ABS((a) - (b)) < 1e-12)
+
+// macro concatenation
+// Why do I need double layer of indirection for macros? https://stackoverflow.com/a/8232426
+#define CONCAT_(x, y)          x##y
+#define CONCAT(x, y)           CONCAT_(x, y)
+#define CONCAT3(x, y, z)       CONCAT(CONCAT(x, y), z)
+#define CONCAT4(x, y, z, w)    CONCAT3(CONCAT(x, y), z, w)
+#define CONCAT5(x, y, z, v, w) CONCAT4(CONCAT(x, y), z, v, w)
+
+// macro testing
+// See https://stackoverflow.com/questions/26099745/test-if-preprocessor-symbol-is-defined-inside-macro
+#define CHOOSE2nd(a, b, ...)                b
+#define MUX_WITH_COMMA(contain_comma, a, b) CHOOSE2nd(contain_comma a, b)
+#define MUX_MACRO_PROPERTY(p, macro, a, b)  MUX_WITH_COMMA(CONCAT(p, macro), a, b)
+// define placeholders for some property
+#define __P_DEF_0  X,
+#define __P_DEF_1  X,
+#define __P_ONE_1  X,
+#define __P_ZERO_0 X,
+// define some selection functions based on the properties of BOOLEAN macro
+#define MUXDEF(macro, X, Y)  MUX_MACRO_PROPERTY(__P_DEF_, macro, X, Y)
+#define MUXNDEF(macro, X, Y) MUX_MACRO_PROPERTY(__P_DEF_, macro, Y, X)
+#define MUXONE(macro, X, Y)  MUX_MACRO_PROPERTY(__P_ONE_, macro, X, Y)
+#define MUXZERO(macro, X, Y) MUX_MACRO_PROPERTY(__P_ZERO_, macro, X, Y)
+
+// test if a boolean macro is defined
+#define ISDEF(macro) MUXDEF(macro, 1, 0)
+// test if a boolean macro is undefined
+#define ISNDEF(macro) MUXNDEF(macro, 1, 0)
+// test if a boolean macro is defined to 1
+#define ISONE(macro) MUXONE(macro, 1, 0)
+// test if a boolean macro is defined to 0
+#define ISZERO(macro) MUXZERO(macro, 1, 0)
+// test if a macro of ANY type is defined
+// NOTE1: it ONLY works inside a function, since it calls `strcmp()`
+// NOTE2: macros defined to themselves (#define A A) will get wrong results
+#define isdef(macro) (strcmp("" #macro, "" STRINGIFY(macro)) != 0)
+
+// simplification for conditional compilation
+#define __IGNORE(...)
+#define __KEEP(...) __VA_ARGS__
+// keep the code if a boolean macro is defined
+#define IFDEF(macro, ...) MUXDEF(macro, __KEEP, __IGNORE)(__VA_ARGS__)
+// keep the code if a boolean macro is undefined
+#define IFNDEF(macro, ...) MUXNDEF(macro, __KEEP, __IGNORE)(__VA_ARGS__)
+// keep the code if a boolean macro is defined to 1
+#define IFONE(macro, ...) MUXONE(macro, __KEEP, __IGNORE)(__VA_ARGS__)
+// keep the code if a boolean macro is defined to 0
+#define IFZERO(macro, ...) MUXZERO(macro, __KEEP, __IGNORE)(__VA_ARGS__)
+
+// functional-programming-like macro (X-macro)
+// apply the function `f` to each element in the container `c`
+// NOTE1: `c` should be defined as a list like:
+//   f(a0) f(a1) f(a2) ...
+// NOTE2: each element in the container can be a tuple
+#define MAP(c, f) c(f)
+
+// 生成x位的全1 mask
+#define BITMASK(x) ((1ull << (x)) - 1)
+// 提取第low位到第high位的所有bit，包括low和high，x[high:low]
+#define BITS(x, high, low) (((x) >> (low)) & BITMASK((high) - (low) + 1))
+// 传入x和x的bit长度，将x sign-extend成为64bit的值
+#define SIGN_EXTEND(x, len) ({ struct { int64_t n : len; } __x = { .n = x }; (uint64_t)__x.n; })
+
+#define ROUNDUP(a, sz)   ((((uintptr_t)a) + (sz) - 1) & ~((sz) - 1))
+#define ROUNDDOWN(a, sz) ((((uintptr_t)a)) & ~((sz) - 1))
+
+#define PG_ALIGN __attribute((aligned(4096)))
+
+#if !defined(likely)
+#define likely(cond)   __builtin_expect(cond, 1)  // if( likely(...) )
+#define unlikely(cond) __builtin_expect(cond, 0)  // if( unlikely(...) )
+#endif
+
+#endif
