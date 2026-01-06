@@ -156,7 +156,7 @@ CFLAGS += -Wstrict-aliasing -Wstrict-overflow
 
 ## compile option
 CFLAGS += $(CONFIG_CC_OPT)
-CFLAGS += $(if $(CONFIG_CC_LTO),-flto)
+CFLAGS += $(if $(CONFIG_CC_LTO),-flto=auto)
 CFLAGS += $(if $(CONFIG_CC_DEBUG),-Og -ggdb3)
 CFLAGS += $(if $(CONFIG_CC_ANALYZER),-fanalyzer)
 
@@ -177,7 +177,7 @@ CXXFLAGS += $(CFLAGS)
 
 # Linker Flags
 LDFLAGS += $(SAN_FLAGS)
-LDFLAGS += $(if $(CONFIG_CC_LTO),-flto)
+LDFLAGS += $(if $(CONFIG_CC_LTO),-flto=auto)
 # LDFLAGS += -Wl,-Map=output.map
 
 # add linker flag -shared if building .so
