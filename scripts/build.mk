@@ -132,10 +132,9 @@ CFLAGS += -Wstrict-aliasing -Wstrict-overflow
 
 ## compile option
 CFLAGS += -O2
-# CFLAGS += -flto
+CFLAGS += -flto
 # CFLAGS += -Og -ggdb3
 # CFLAGS += -fanalyzer
-# CFLAGS += -fdata-sections -ffunction-sections
 
 ## Sanitizers
 # SAN_FLAGS += -fsanitize=undefined
@@ -154,8 +153,7 @@ CXXFLAGS += $(CFLAGS)
 
 # Linker Flags
 LDFLAGS += $(SAN_FLAGS)
-# LDFLAGS += -flto
-LDFLAGS += -Wl,--gc-sections
+LDFLAGS += -flto
 # LDFLAGS += -Wl,-Map=output.map
 
 # add linker flag -shared if building .so

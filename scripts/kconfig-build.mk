@@ -159,7 +159,6 @@ CFLAGS += $(CONFIG_CC_OPT)
 CFLAGS += $(if $(CONFIG_CC_LTO),-flto)
 CFLAGS += $(if $(CONFIG_CC_DEBUG),-Og -ggdb3)
 CFLAGS += $(if $(CONFIG_CC_ANALYZER),-fanalyzer)
-# CFLAGS += -fdata-sections -ffunction-sections
 
 ## Sanitizers
 SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_UNDEFINED),-fsanitize=undefined)
@@ -179,7 +178,6 @@ CXXFLAGS += $(CFLAGS)
 # Linker Flags
 LDFLAGS += $(SAN_FLAGS)
 LDFLAGS += $(if $(CONFIG_CC_LTO),-flto)
-LDFLAGS += -Wl,--gc-sections
 # LDFLAGS += -Wl,-Map=output.map
 
 # add linker flag -shared if building .so
