@@ -1,5 +1,22 @@
 #!/bin/bash
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+
+fetch() {
+    file=$1
+    mkdir -p "$(dirname "$file")"
+    url=https://raw.githubusercontent.com/torvalds/linux/refs/heads/master/scripts/"$file"
+    if curl -fL -o "$file" "$url" 2> /dev/null ; then
+        echo -e "${GREEN}success: $url${NC}"
+    else
+        echo -e "${RED}error: $url${NC}"
+    fi
+}
+
 LIST="""
     basic/fixdep.c
     include/array_size.h
@@ -16,7 +33,6 @@ LIST="""
     kconfig/lexer.l
     kconfig/lkc_proto.h
     kconfig/lkc.h
-    kconfig/lxdialog
     kconfig/lxdialog/checklist.c
     kconfig/lxdialog/dialog.h
     kconfig/lxdialog/inputbox.c
@@ -35,7 +51,8 @@ LIST="""
     kconfig/util.c
 """
 
-for FILE in $LIST
+for file in $LIST
 do
-    wget -O "$FILE" https://raw.githubusercontent.com/torvalds/linux/refs/heads/master/scripts/"$FILE"
+    fetch "$file" &
 done
+wait
