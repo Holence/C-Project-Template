@@ -44,8 +44,8 @@ NAME ?= main
 
 # all the source files (.s, .S, .c, .cpp)
 # will be compiled into object files using compiler, see "Recipes"
-# default value: all srcs under current working directory
-SRCS ?= $(call find_srcs, .)
+# default value: all srcs under current working directory, including symlinked folders
+SRCS ?= $(call find_srcs, ., -follow)
 # translate to relative path, and remove duplicated
 SRCS := $(sort $(foreach __file,$(SRCS),$(shell realpath --no-symlinks --relative-to . $(__file))))
 ifneq ($(findstring ../, $(SRCS)),)
@@ -64,8 +64,8 @@ BUILD_DIR ?= ./build/$(NAME)
 
 # all the dirs for searching header files
 # will be used as -I flags for compiling
-# default value: all dirs under current working directory
-INC_DIRS ?= $(call find_dirs, .)
+# default value: all dirs under current working directory, including symlinked folders
+INC_DIRS ?= $(call find_dirs, ., -follow)
 
 ##### Config for Build LIB #####
 STATIC ?=
@@ -86,7 +86,11 @@ SHARED ?=
 INSTALL_DESTDIR ?=
 INSTALL_PREFIX  ?= /usr/local
 INSTALL_DIR     = $(INSTALL_DESTDIR)$(INSTALL_PREFIX)
+ifneq ($(wildcard include),)
 INSTALL_HEADERS ?= $(shell find include -mindepth 1 -maxdepth 1 -not \( -path 'include/config' -o -path 'include/generated' \))
+else
+INSTALL_HEADERS ?=
+endif
 
 ##### Config for Kconfig Tool #####
 # build kconfig tools from linux source code
