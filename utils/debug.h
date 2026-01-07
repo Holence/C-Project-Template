@@ -62,7 +62,7 @@
 #if defined(CONFIG_ENABLE_DEBUG_ASSERT) && CONFIG_ENABLE_DEBUG_ASSERT
 // Same as Assert(), but can be turned off
 #define DebugAssert(cond, ...) \
-    Assert(##__VA_ARGS__)
+    Assert(cond, ##__VA_ARGS__)
 
 // Require() is for validating function arg
 // only used during development
