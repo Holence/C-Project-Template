@@ -1,6 +1,6 @@
 ```sh
-# compile and install mymath lib
-cd mymath
+# compile and install libmymath
+cd libmymath
 make menuconfig
 sudo make install
 
@@ -12,6 +12,6 @@ sudo make install
 demo
 
 # uninstall
-cd mymath && sudo make uninstall
+cd libmymath && sudo make uninstall
 cd demo && sudo make uninstall
 ```
