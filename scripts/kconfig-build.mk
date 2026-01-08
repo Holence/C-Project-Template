@@ -185,6 +185,12 @@ ifeq ($(SHARED),1)
 LDFLAGS += -shared
 endif
 
+# strip extra spaces
+CPPFLAGS := $(strip $(CPPFLAGS))
+CFLAGS   := $(strip $(CFLAGS))
+CXXFLAGS := $(strip $(CXXFLAGS))
+LDFLAGS  := $(strip $(LDFLAGS))
+
 ################################
 #   Kconfig Related Function   #
 ################################
