@@ -385,6 +385,7 @@ $(TARGET_LIB_STATIC): $(OBJS)
 # mconf will create and edit .config
 menuconfig:
 	$(MCONF) Kconfig
+	$(CONF) --syncconfig Kconfig
 PHONY += menuconfig
 
 __kconfig_auto_generated = include/config/auto.conf include/config/auto.conf.cmd include/generated/autoconf.h include/generated/rustc_cfg
