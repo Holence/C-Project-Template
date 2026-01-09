@@ -142,48 +142,60 @@ INC_FLAGS += $(addprefix -I,$(INC_DIRS))
 # Variables Names Convention
 # https://www.gnu.org/software/make/manual/html_node/Implicit-Variables.html
 
+# Note: Later flags will override earlier ones. Thus, 
+# if user assign flags in Makefile then include build.mk,
+# we should append them in the end.
+
 # C PreProcessor Flags
 # The -MMD and -MP flags will let gcc generate .d files
 # which will be used by Makefile (see `-include $(DEPS)`)
-CPPFLAGS += $(INC_FLAGS) -MMD -MP
+__CPPFLAGS :=
+__CPPFLAGS += $(INC_FLAGS)
+__CPPFLAGS += -MMD -MP
 
 # C Compiler Flags
+__CFLAGS :=
 ## warning option
-CFLAGS += -Wall -Werror -Wextra -Wpedantic
-CFLAGS += -Wno-unused-function -Wno-unused-parameter
-CFLAGS += -Wno-format
-CFLAGS += -Wstrict-aliasing -Wstrict-overflow
-
+__CFLAGS += -Wall -Werror -Wextra -Wpedantic
+__CFLAGS += -Wno-unused-function -Wno-unused-parameter
+__CFLAGS += -Wno-format
+__CFLAGS += -Wstrict-aliasing -Wstrict-overflow
 ## compile option
-CFLAGS += $(CONFIG_CC_OPT)
-CFLAGS += $(if $(CONFIG_CC_LTO),-flto=auto)
-CFLAGS += $(if $(CONFIG_CC_DEBUG),-Og -ggdb3)
-CFLAGS += $(if $(CONFIG_CC_ANALYZER),-fanalyzer)
+__CFLAGS += $(CONFIG_CC_OPT)
+__CFLAGS += $(if $(CONFIG_CC_LTO),-flto=auto)
+__CFLAGS += $(if $(CONFIG_CC_DEBUG),-Og -ggdb3)
+__CFLAGS += $(if $(CONFIG_CC_ANALYZER),-fanalyzer)
 
-## Sanitizers
-SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_UNDEFINED),-fsanitize=undefined)
-SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_ADDRESS),-fsanitize=address) # don't use this with valgrind
-SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_LEAK),-fsanitize=leak) # don't use this with valgrind
-SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_THREAD),-fsanitize=thread) # can't be combined with -fsanitize=address, -fsanitize=leak
-CFLAGS += $(SAN_FLAGS)
-
-# add compiler flag -fPIC if building .so
-ifeq ($(SHARED),1)
-CFLAGS += -fPIC
-endif
+# Sanitizer
+__SAN_FLAGS :=
+__SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_UNDEFINED),-fsanitize=undefined)
+__SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_ADDRESS),-fsanitize=address) # don't use this with valgrind
+__SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_LEAK),-fsanitize=leak) # don't use this with valgrind
+__SAN_FLAGS += $(if $(CONFIG_CC_SANITIZE_THREAD),-fsanitize=thread) # can't be combined with -fsanitize=address, -fsanitize=leak
 
 # CXX Compiler Flags
-CXXFLAGS += $(CFLAGS)
+__CXXFLAGS := $(__CFLAGS)
 
 # Linker Flags
-LDFLAGS += $(SAN_FLAGS)
-LDFLAGS += $(if $(CONFIG_CC_LTO),-flto=auto)
-# LDFLAGS += -Wl,-Map=output.map
+__LDFLAGS :=
+__LDFLAGS += $(if $(CONFIG_CC_LTO),-flto=auto)
+# __LDFLAGS += -Wl,-Map=output.map
 
-# add linker flag -shared if building .so
+# if building .so
 ifeq ($(SHARED),1)
-LDFLAGS += -shared
+__CFLAGS  += -fPIC
+__LDFLAGS += -shared
 endif
+
+# Sanitizer flags should be passed into both compiler and linker
+SAN_FLAGS := $(__SAN_FLAGS) $(SAN_FLAGS) 
+__CFLAGS  += $(SAN_FLAGS)
+__LDFLAGS += $(SAN_FLAGS)
+
+CPPFLAGS := $(__CPPFLAGS) $(CPPFLAGS)
+CFLAGS   := $(__CFLAGS) $(CFLAGS)
+CXXFLAGS := $(__CXXFLAGS) $(CXXFLAGS)
+LDFLAGS  := $(__LDFLAGS) $(LDFLAGS)
 
 # strip extra spaces
 CPPFLAGS := $(strip $(CPPFLAGS))
