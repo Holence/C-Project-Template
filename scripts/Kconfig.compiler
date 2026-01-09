@@ -28,6 +28,7 @@ menu "Compiler Options"
 			default ""
 		
 		menu "Sanitizers"
+			comment "Dynamic Analysis at runtime"
 			config CC_SANITIZE_UNDEFINED
 				bool "Enable UndefinedBehaviorSanitizer (-fsanitize=undefined)"
 				default n
@@ -82,6 +83,8 @@ menu "Compiler Options"
 		config CC_ANALYZER
 			bool "Enable static analysis (-fanalyzer)"
 			default n
+			help
+				Static Analysis at compile time
 	endmenu
 
 	config GENERATE_PREPROCESSED
