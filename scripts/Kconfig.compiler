@@ -2,90 +2,89 @@
 
 menu "Compiler Options"
 
-	menu "CC Options"
-		choice
-			prompt "Optimization Level"
-			default CC_O2
-			config CC_O0
-				bool "O0"
-			config CC_O1
-				bool "O1"
-			config CC_O2
-				bool "O2"
-			config CC_O3
-				bool "O3"
-			config CC_Os
-				bool "Os"
-		endchoice
+	choice
+		depends on !CC_DEBUG
+		prompt "Optimization Level"
+		default CC_O2
+		config CC_O0
+			bool "O0"
+		config CC_O1
+			bool "O1"
+		config CC_O2
+			bool "O2"
+		config CC_O3
+			bool "O3"
+		config CC_Os
+			bool "Os"
+	endchoice
 
-		config CC_OPT
-			string
-			default "-O0" if CC_O0
-			default "-O1" if CC_O1
-			default "-O2" if CC_O2
-			default "-O3" if CC_O3
-			default "-Os" if CC_Os
-			default ""
-		
-		menu "Sanitizers"
-			comment "Dynamic Analysis at runtime"
-			config CC_SANITIZE_UNDEFINED
-				bool "Enable UndefinedBehaviorSanitizer (-fsanitize=undefined)"
-				default n
-				help
-					A fast undefined behavior detector
-
-			config CC_SANITIZE_ADDRESS
-				bool "Enable AddressSanitizer (-fsanitize=address)"
-				default n
-				depends on !CC_SANITIZE_THREAD
-				select CC_DEBUG
-				help
-					A fast memory error detector
-
-					This option cannot be combined with -fsanitize=thread or -fsanitize=hwaddress
-
-					When compiling with -fsanitize=address, you should also use -g to produce
-					more meaningful output
-					
-					And don't use this with valgrind!
-
-			config CC_SANITIZE_LEAK
-				bool "Enable LeakSanitizer (-fsanitize=leak)"
-				default n
-				depends on !CC_SANITIZE_THREAD
-				help
-					A memory leak detector
-
-					This option cannot be combined with -fsanitize=thread
-					
-					And don't use this with valgrind!
-		
-			config CC_SANITIZE_THREAD
-				bool "Enable ThreadSanitizer (-fsanitize=thread)"
-				default n
-				help
-					A fast data race detector
-
-					This option cannot be combined with -fsanitize=address, -fsanitize=leak
-
-					And don't use this with valgrind!
-		endmenu
-
-		config CC_DEBUG
-			bool "Enable debug information (-Og -ggdb3)"
-			default n
-
-		config CC_LTO
-			bool "Enable link-time optimization (-flto)"
-			default y
-
-		config CC_ANALYZER
-			bool "Enable static analysis (-fanalyzer)"
+	config CC_OPT
+		depends on !CC_DEBUG
+		string
+		default "-O0" if CC_O0
+		default "-O1" if CC_O1
+		default "-O2" if CC_O2
+		default "-O3" if CC_O3
+		default "-Os" if CC_Os
+	
+	menu "Sanitizers"
+		comment "Dynamic Analysis at runtime"
+		config CC_SANITIZE_UNDEFINED
+			bool "Enable UndefinedBehaviorSanitizer (-fsanitize=undefined)"
 			default n
 			help
-				Static Analysis at compile time
+				A fast undefined behavior detector
+
+		config CC_SANITIZE_ADDRESS
+			bool "Enable AddressSanitizer (-fsanitize=address)"
+			default n
+			depends on !CC_SANITIZE_THREAD
+			select CC_DEBUG
+			help
+				A fast memory error detector
+
+				This option cannot be combined with -fsanitize=thread or -fsanitize=hwaddress
+
+				When compiling with -fsanitize=address, you should also use -g to produce
+				more meaningful output
+				
+				And don't use this with valgrind!
+
+		config CC_SANITIZE_LEAK
+			bool "Enable LeakSanitizer (-fsanitize=leak)"
+			default n
+			depends on !CC_SANITIZE_THREAD
+			help
+				A memory leak detector
+
+				This option cannot be combined with -fsanitize=thread
+				
+				And don't use this with valgrind!
+	
+		config CC_SANITIZE_THREAD
+			bool "Enable ThreadSanitizer (-fsanitize=thread)"
+			default n
+			help
+				A fast data race detector
+
+				This option cannot be combined with -fsanitize=address, -fsanitize=leak
+
+				And don't use this with valgrind!
 	endmenu
+
+	config CC_DEBUG
+		bool "Enable debug information (-Og -ggdb3)"
+		default n
+
+	config CC_LTO
+		bool "Enable link-time optimization (-flto)"
+		default y
+
+	config CC_ANALYZER
+		bool "Enable static analysis (-fanalyzer)"
+		default n
+		help
+			Static Analysis at compile time
 
 	config GENERATE_PREPROCESSED
 		bool "Also generate preprocessed files (-E)"
