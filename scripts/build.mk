@@ -55,8 +55,8 @@ BUILD_DIR ?= ./build/$(NAME)
 
 # all the dirs for searching header files
 # will be used as -I flags for compiling
-# default value: all dirs under current working directory, including symlinked folders
-INC_DIRS ?= $(shell find . -type d -path '*build' -prune -o -type d -print)
+# default value: all dirs under current working directory, excluding build, including symlinked folders
+INC_DIRS ?= $(shell find . -type d -path '*build' -prune -or -type d -follow -print)
 
 ##### Config for Build LIB #####
 STATIC ?=
