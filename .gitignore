@@ -4,6 +4,7 @@
 **/__pycache__/
 .config
 .config.old
+.saved_ldflags
 
 # Prerequisites
 *.d

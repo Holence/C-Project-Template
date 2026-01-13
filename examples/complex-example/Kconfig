@@ -1,0 +1,7 @@
+config USE_LIBA
+    bool "Use liba"
+
+config USE_LIBB
+    bool "Use libb"
+
+source "scripts/Kconfig.compiler"
