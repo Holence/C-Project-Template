@@ -1,15 +1,9 @@
 include scripts/setting.mk
 
-all: fixdep conf mconf
-
-fixdep:
-	@$(MAKE) -s -f fixdep.mk
-
-conf:
-	@$(MAKE) -s -f kconfig.mk NAME=conf
-
-mconf:
-	@$(MAKE) -s -f kconfig.mk NAME=mconf
+all:
+	@$(MAKE) -f fixdep.mk
+	@$(MAKE) -f kconfig.mk NAME=conf
+	@$(MAKE) -f kconfig.mk NAME=mconf
 
 clean-all:
 	@$(MAKE) -f fixdep.mk clean-all
@@ -18,9 +12,9 @@ clean-all:
 	-$(RM) -r build
 
 install:
-	@$(MAKE) -s -f fixdep.mk install
-	@$(MAKE) -s -f kconfig.mk NAME=conf install
-	@$(MAKE) -s -f kconfig.mk NAME=mconf install
+	@$(MAKE) -f fixdep.mk install
+	@$(MAKE) -f kconfig.mk NAME=conf install
+	@$(MAKE) -f kconfig.mk NAME=mconf install
 
 uninstall:
 	@$(MAKE) -f fixdep.mk uninstall
