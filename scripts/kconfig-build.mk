@@ -65,7 +65,7 @@ BUILD_DIR ?= ./build/$(NAME)
 # all the dirs for searching header files
 # will be used as -I flags for compiling
 # default value: all dirs under current working directory, including symlinked folders
-INC_DIRS ?= $(call find_dirs, ., -follow)
+INC_DIRS ?= $(shell find . -type d -path '*build' -prune -o -type d -print)
 
 ##### Config for Build LIB #####
 STATIC ?=
@@ -238,7 +238,7 @@ _why =                                                                \
         $(if $(wildcard $@),                                          \
             $(if $(newer-prereqs),? due to newer: $(newer-prereqs),   \
                 $(if $(cmd-check),                                    \
-                    $(if $(savedcmd_$@),? due to command line change, \
+                    $(if $(savedcmd_$@),? due to command line change $(newline) $(strip $(savedcmd_$@)) $(newline) $(strip $($1_cmd)) , \
                         ? due to dep missing ($(@:.o=.d))             \
                     )                                                 \
                 )                                                     \
