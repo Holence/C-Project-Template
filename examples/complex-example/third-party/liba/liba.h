@@ -1,1 +1,1 @@
-void func_a();
+int func_a();

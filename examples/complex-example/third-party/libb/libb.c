@@ -1,5 +1,6 @@
 #include <stdio.h>
 
-void func_b() {
-    printf("hello from libb!\n");
+int func_b() {
+    printf("[libb] computing\n");
+    return 514;
 }

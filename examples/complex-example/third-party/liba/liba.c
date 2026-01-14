@@ -1,5 +1,6 @@
 #include <stdio.h>
 
-void func_a() {
-    printf("hello from liba!\n");
+int func_a() {
+    printf("[liba] computing\n");
+    return 114;
 }
