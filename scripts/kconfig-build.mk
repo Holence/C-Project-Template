@@ -433,7 +433,7 @@ PHONY += valgrind
 clean::
 ifeq ($(BUILD_DIR),.)
 # if BUILD_DIR==. then we need to somehow sum up all the generated files
-	$(foreach __file,$(OBJS) $(DEPS) $(TARGET),\
+	$(foreach __file,$(OBJS) $(DEPS) $(TARGET) $(SAVED_LDFLAGS),\
 		$(call logged_rm,$(__file))$(newline)\
 	)
 else
@@ -444,7 +444,10 @@ PHONY += clean
 
 # clean kconfig related files
 clean-config:
-	$(call logged_rm,include/generated include/config .config .config.old)
+	$(call logged_rm,include/generated)
+	$(call logged_rm,include/config)
+	$(call logged_rm,.config)
+	$(call logged_rm,.config.old)
 PHONY += clean-config
 
 # all clean targets

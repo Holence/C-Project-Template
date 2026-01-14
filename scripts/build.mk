@@ -294,7 +294,7 @@ PHONY += valgrind
 clean::
 ifeq ($(BUILD_DIR),.)
 # if BUILD_DIR==. then we need to somehow sum up all the generated files
-	$(foreach __file,$(OBJS) $(DEPS) $(TARGET),\
+	$(foreach __file,$(OBJS) $(DEPS) $(TARGET) $(SAVED_LDFLAGS),\
 		$(call logged_rm,$(__file))$(newline)\
 	)
 else
