@@ -1,6 +1,5 @@
 include scripts/setting.mk
 include scripts/tools.mk
-include scripts/color.mk
 
 SRCS := $(call find_srcs, kconfig, -mindepth 1 -maxdepth 1)
 SRCS := $(filter-out kconfig/mconf.c kconfig/conf.c, $(SRCS))

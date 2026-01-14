@@ -14,7 +14,6 @@
 # ├── Makefile
 # └── scripts
 #     ├── build.mk
-#     ├── color.mk
 #     ├── kconfig-build.mk
 #     ├── setting.mk
 #     └── tools.mk
@@ -23,7 +22,6 @@
 __mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 __mkfile_dir  := $(dir $(__mkfile_path))
 include $(__mkfile_dir)/tools.mk
-include $(__mkfile_dir)/color.mk
 
 ################################
 #        Custom Config         #
@@ -431,12 +429,12 @@ PHONY += valgrind
 
 # clean build dir
 clean::
-	-$(RM) -r $(BUILD_DIR)
+	$(call logged_rm,$(BUILD_DIR))
 PHONY += clean
 
 # clean kconfig related files
 clean-config:
-	-$(RM) -r include/generated include/config .config .config.old
+	$(call logged_rm,include/generated include/config .config .config.old)
 PHONY += clean-config
 
 # all clean targets
@@ -482,18 +480,18 @@ PHONY += install
 # - each file/folder in INSTALL_HEADERS in /usr/local/include/*
 uninstall:
 ifneq ($(TARGET_EXEC),)
-	-$(RM) -r $(INSTALL_DIR)/bin/$(notdir $(TARGET_EXEC))
+	$(call logged_rm,$(INSTALL_DIR)/bin/$(notdir $(TARGET_EXEC)))
 endif
 ifneq ($(TARGET_LIB_STATIC),)
-	-$(RM) -r $(INSTALL_DIR)/lib/$(notdir $(TARGET_LIB_STATIC))
+	$(call logged_rm,$(INSTALL_DIR)/lib/$(notdir $(TARGET_LIB_STATIC)))
 endif
 ifneq ($(TARGET_LIB_SHARED),)
-	-$(RM) -r $(INSTALL_DIR)/lib/$(notdir $(TARGET_LIB_SHARED))
+	$(call logged_rm,$(INSTALL_DIR)/lib/$(notdir $(TARGET_LIB_SHARED)))
 	ldconfig
 endif
 ifneq ($(TARGET_LIB_STATIC)$(TARGET_LIB_SHARED),)
 	$(foreach __file,$(INSTALL_HEADERS),\
-		-$(RM) -r $(INSTALL_DIR)/$(__file)$(newline)\
+		$(call logged_rm,$(INSTALL_DIR)/$(__file)$(newline))\
 	)
 endif
 PHONY += uninstall

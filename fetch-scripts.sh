@@ -37,7 +37,6 @@ LIST="""
     utils/types.h
     utils/debug.h
     scripts/kconfig-build.mk
-    scripts/color.mk
     scripts/addon/flex-bison.mk
     scripts/tools.mk
     scripts/Kconfig.compiler
