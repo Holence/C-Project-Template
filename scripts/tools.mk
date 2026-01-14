@@ -68,9 +68,12 @@ define run_valgrind
 	valgrind --show-error-list=yes --leak-check=full --show-leak-kinds=all --track-origins=yes $1
 endef
 
+# rm one file/folder if exists and print log
 define logged_rm
-	$(Q)$(RM) -r $1
-	$(call colored_info,$(ANSI_FG_RED),- RM $1)
+	$(if $(wildcard $1),
+		$(Q)$(RM) -r "$1"
+		@$(call print_ansi_fg_red,- RM $1),
+	)
 endef
 
 ################################

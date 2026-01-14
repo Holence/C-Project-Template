@@ -103,6 +103,8 @@ ifeq ($(SHARED),1)
 TARGET_LIB_SHARED = $(BUILD_DIR)/lib$(NAME).so
 endif
 
+TARGET = $(TARGET_EXEC) $(TARGET_LIB_STATIC) $(TARGET_LIB_SHARED)
+
 # Prepends BUILD_DIR and appends .o to every src file
 # As an example, ./your_dir/hello.cpp turns into BUILD_DIR/./your_dir/hello.cpp.o
 OBJS = $(SRCS:%=$(BUILD_DIR)/%.o)
@@ -273,7 +275,7 @@ $(TARGET_LIB_STATIC): $(OBJS)
 ################################
 
 .DEFAULT_GOAL = all
-all: $(TARGET_EXEC) $(TARGET_LIB_STATIC) $(TARGET_LIB_SHARED)
+all: $(TARGET)
 PHONY += all
 
 run: $(TARGET_EXEC)
@@ -290,7 +292,15 @@ PHONY += valgrind
 
 # clean build dir
 clean::
+ifeq ($(BUILD_DIR),.)
+# if BUILD_DIR==. then we need to somehow sum up all the generated files
+	$(foreach __file,$(OBJS) $(DEPS) $(TARGET),\
+		$(call logged_rm,$(__file))$(newline)\
+	)
+else
+# normally BUILD_DIR==./build/xxx
 	$(call logged_rm,$(BUILD_DIR))
+endif
 PHONY += clean
 
 # all clean targets

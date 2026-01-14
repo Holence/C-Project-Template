@@ -35,4 +35,6 @@ LDFLAGS += -lfl
 	$(Q)$(FLEX) --noline $(FLEX_FLAGS) -o $@ $<
 
 clean::
-	-$(RM) $(FLEX_C) $(BISON_C) $(BISON_H)
+	$(call logged_rm,$(FLEX_C))
+	$(call logged_rm,$(BISON_C))
+	$(call logged_rm,$(BISON_H))
