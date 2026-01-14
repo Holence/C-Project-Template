@@ -71,8 +71,8 @@ endef
 # rm one file/folder if exists and print log
 define logged_rm
 	$(if $(wildcard $1),
-		$(Q)$(RM) -r "$1"
-		@$(call print_ansi_fg_red,- RM $1),
+		@$(call print_ansi_fg_red,- RM $(abspath $1))
+		$(Q)$(RM) -r "$1",
 	)
 endef
 

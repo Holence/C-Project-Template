@@ -360,7 +360,7 @@ $(SAVED_LDFLAGS): FORCE
 	@echo "$(LDFLAGS)" | cmp -s - $@ || echo "$(LDFLAGS)" > $@
 
 # Link all Object Files into TARGET_EXEC or TARGET_LIB_SHARED
-link_log = @$(call print_ansi_fg_green,+ Link $@)
+link_log = @$(call print_ansi_fg_green,+ Link $(abspath $@))
 link_cmd = $(CXX) $(OBJS) -o $@ $(LDFLAGS)
 $(TARGET_EXEC) $(TARGET_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
 	$(link_log)
@@ -369,7 +369,7 @@ $(TARGET_EXEC) $(TARGET_LIB_SHARED): $(OBJS) $(SAVED_LDFLAGS)
 ##### Archive #####
 
 # Archive all Object Files into TARGET_LIB_STATIC
-archive_log = @$(call print_ansi_fg_green,+ AR $@)
+archive_log = @$(call print_ansi_fg_green,+ AR $(abspath $@))
 archive_cmd = $(AR) rcs $@ $^
 $(TARGET_LIB_STATIC): $(OBJS)
 	$(archive_log)
@@ -460,7 +460,7 @@ PHONY += clean-all
 define __install
 	$(Q)install -d $2
 	$(Q)install -m$3 $1 $2
-	@$(call print_ansi_fg_green,+ Install $$(ls $2$(notdir $1)))
+	@$(call print_ansi_fg_green,+ Install $(shell ls $2$(notdir $1)))
 endef
 
 # Install to system
