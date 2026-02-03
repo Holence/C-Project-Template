@@ -1,6 +1,7 @@
 #ifndef __HEX_H__
 #define __HEX_H__
 
+#include "debug.h"
 #include <stdint.h>
 #include <stdbool.h>
 

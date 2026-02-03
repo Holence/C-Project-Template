@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#include "debug.h"
 #include "hex.h"
 
 /// @brief dump memory in addr[0:len]
@@ -42,6 +41,11 @@ size_t bytes_to_hex(const uint8_t bytes[], size_t bytes_len, char hex[], bool sw
     Require(hex != NULL);
     Require((void *)bytes != (void *)hex);
 
+    if (bytes_len == 0) {
+        *hex = '\0';
+        return 0;
+    }
+
     static const char hex_lut[] = "0123456789ABCDEF";
     const uint8_t *bytes_ptr = switch_endian ? bytes + bytes_len - 1 : bytes;
     const int step = switch_endian ? -1 : 1;
@@ -77,6 +81,10 @@ size_t hex_to_bytes(const char hex[], size_t hex_len, uint8_t bytes[], bool swit
     Require(hex != NULL);
     Require((void *)bytes != (void *)hex);
     Require((hex_len & 1) == 0);
+
+    if (hex_len == 0) {
+        return 0;
+    }
 
     const size_t bytes_len = hex_len >> 1;
     uint8_t *bytes_ptr = switch_endian ? bytes + bytes_len - 1 : bytes;
