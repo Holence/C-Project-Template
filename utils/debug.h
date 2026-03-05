@@ -42,10 +42,18 @@
 #define Error(format, ...) \
     ColorPrintStderr(ANSI_FG_RED, "[%s:%d %s] " format, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #else
-#define ColorLog(...)
-#define Log(...)
-#define Debug(...)
-#define Error(...)
+#define ColorLog(...) \
+    do {              \
+    } while (0)
+#define Log(...) \
+    do {         \
+    } while (0)
+#define Debug(...) \
+    do {           \
+    } while (0)
+#define Error(...) \
+    do {           \
+    } while (0)
 #endif
 
 // Assert() is for inner state checking
@@ -85,9 +93,15 @@
         exit(1);       \
     } while (0)
 #else
-#define DebugAssert(...)
-#define Require(...)
-#define TODO(...)
+#define DebugAssert(...) \
+    do {                 \
+    } while (0)
+#define Require(...) \
+    do {             \
+    } while (0)
+#define TODO(...) \
+    do {          \
+    } while (0)
 #endif
 
 #endif
