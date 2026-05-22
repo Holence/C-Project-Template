@@ -136,6 +136,7 @@ __CFLAGS += -Wall -Werror -Wextra -Wpedantic
 __CFLAGS += -Wno-unused-function -Wno-unused-parameter
 __CFLAGS += -Wno-format
 __CFLAGS += -Wstrict-aliasing -Wstrict-overflow
+__CFLAGS += -Wconversion -Warith-conversion -Wformat=2
 ## compile option
 __CFLAGS += -O2
 __CFLAGS += -flto=auto
